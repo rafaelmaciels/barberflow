@@ -1,15 +1,16 @@
 <?php
 
 // =========================
+// DEBUG (remova depois)
+// =========================
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+// =========================
 // HEADERS (CORS + JSON)
 // =========================
-
-// ⚠️ NÃO usar "*" com sessão
 header("Access-Control-Allow-Origin: http://localhost:3000");
-
-// 🔥 ESSENCIAL para sessão funcionar no React
 header("Access-Control-Allow-Credentials: true");
-
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
@@ -37,11 +38,21 @@ $request = str_replace('/backend', '', $request);
 // Remove index.php
 $request = str_replace('/index.php', '', $request);
 
-// 🔥 Remove barra final (evita erro tipo /services/)
+// Remove barra final
 $request = rtrim($request, '/');
 
+// 🔥 Se vier vazio, define rota padrão
+if ($request === '' || $request === null) {
+    $request = '/services';
+}
+
+// Garante que começa com "/"
+if ($request[0] !== '/') {
+    $request = '/' . $request;
+}
+
 // =========================
-// IMPORTS CORRETOS
+// IMPORTS
 // =========================
 require_once __DIR__ . '/../controllers/AppointmentController.php';
 require_once __DIR__ . '/../controllers/ServiceController.php';

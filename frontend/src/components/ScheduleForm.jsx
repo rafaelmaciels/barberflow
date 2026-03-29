@@ -1,114 +1,137 @@
-import React, { useState } from 'react';
-import api from '../services/api';
-import ServiceSelector from './ServiceSelector';
-import TimeSlots from './TimeSlots';
+import React, { useState } from "react";
+import api from "../services/api";
+import ServiceSelector from "./ServiceSelector";
+import TimeSlots from "./TimeSlots";
 
 function ScheduleForm() {
-    const [formData, setFormData] = useState({
-        client_name: '',
-        service_id: '',
-        time_slot_id: '',
-        date: ''
-    });
+  const [formData, setFormData] = useState({
+    nome_cliente: "",
+    id_servico: "",
+    id_horario: "",
+    data_agendamento: ""
+  });
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+  // Atualiza inputs comuns
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-    const handleServiceSelect = (serviceId) => {
-        setFormData({ ...formData, service_id: serviceId });
-    };
+  // Serviço
+  const handleServiceSelect = (serviceId) => {
+    setFormData({ ...formData, id_servico: serviceId });
+  };
 
-    const handleTimeSelect = (timeId) => {
-        setFormData({ ...formData, time_slot_id: timeId });
-    };
+  // Horário
+  const handleTimeSelect = (timeId) => {
+    setFormData({ ...formData, id_horario: timeId });
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  // Submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        if (!formData.service_id || !formData.time_slot_id) {
-            alert("Selecione um serviço e um horário.");
-            return;
-        }
+    console.log("📦 Enviando dados:", formData); // DEBUG
 
-        try {
-            const response = await fetch(`${api.baseURL}/appointments`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(formData)
-            });
+    // Validação
+    if (
+      !formData.nome_cliente ||
+      !formData.id_servico ||
+      !formData.id_horario ||
+      !formData.data_agendamento
+    ) {
+      alert("Preencha todos os campos!");
+      return;
+    }
 
-            const data = await response.json();
+    try {
+      const response = await fetch(`${api.baseURL}/appointments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      });
 
-            alert(data.success || data.error);
+      const data = await response.json();
 
-            // Atualiza horários depois do agendamento
-            setFormData({
-                client_name: '',
-                service_id: '',
-                time_slot_id: '',
-                date: ''
-            });
+      console.log("📥 Resposta:", data); // DEBUG
 
-        } catch (error) {
-            alert("Erro ao agendar. Verifique o servidor.");
-        }
-    };
+      if (data.success) {
+        alert("Agendamento realizado com sucesso!");
 
-    return (
-        <form onSubmit={handleSubmit} className="schedule-form">
-            <h2>Novo Agendamento</h2>
+        // Reset
+        setFormData({
+          nome_cliente: "",
+          id_servico: "",
+          id_horario: "",
+          data_agendamento: ""
+        });
+      } else {
+        alert(data.error || "Erro ao agendar");
+      }
+    } catch (error) {
+      console.error("Erro:", error);
+      alert("Erro ao conectar com o servidor");
+    }
+  };
 
-            <div className="form-group">
-                <label>Nome Completo:</label>
-                <input
-                    type="text"
-                    name="client_name"
-                    value={formData.client_name}
-                    onChange={handleChange}
-                    required
-                />
-            </div>
+  return (
+    <form onSubmit={handleSubmit} className="schedule-form">
+      <h2>Novo Agendamento</h2>
 
-            <div className="form-group">
-                <label>Serviço:</label>
-                <ServiceSelector
-                    onSelect={handleServiceSelect}
-                    value={formData.service_id}
-                />
-            </div>
+      {/* Nome */}
+      <div className="form-group">
+        <label>Nome Completo:</label>
+        <input
+          type="text"
+          name="nome_cliente"
+          value={formData.nome_cliente}
+          onChange={handleChange}
+          required
+        />
+      </div>
 
-            <div className="form-group">
-                <label>Data:</label>
-                <input
-                    type="date"
-                    name="date"
-                    value={formData.date}
-                    onChange={handleChange}
-                    required
-                />
-            </div>
+      {/* Serviço */}
+      <div className="form-group">
+        <label>Serviço:</label>
+        <ServiceSelector
+          onSelect={handleServiceSelect}
+          value={formData.id_servico}
+        />
+      </div>
 
-            <div className="form-group">
-                <label>Horário:</label>
-                {formData.date ? (
-                    <TimeSlots
-                        date={formData.date}
-                        onSelect={handleTimeSelect}
-                        value={formData.time_slot_id}
-                    />
-                ) : (
-                    <p className="hint">Escolha uma data primeiro</p>
-                )}
-            </div>
+      {/* Data */}
+      <div className="form-group">
+        <label>Data:</label>
+        <input
+          type="date"
+          name="data_agendamento"
+          value={formData.data_agendamento}
+          onChange={handleChange}
+          required
+        />
+      </div>
 
-            <button type="submit" className="btn-submit">
-                Confirmar Agendamento
-            </button>
-        </form>
-    );
+      {/* Horário */}
+      <div className="form-group">
+        <label>Horário:</label>
+        {formData.data_agendamento ? (
+          <TimeSlots
+            date={formData.data_agendamento}
+            onSelect={handleTimeSelect}
+            value={formData.id_horario}
+          />
+        ) : (
+          <p className="hint">Escolha uma data primeiro</p>
+        )}
+      </div>
+
+      {/* Botão */}
+      <button type="submit" className="btn-submit">
+        Confirmar Agendamento
+      </button>
+    </form>
+  );
 }
 
 export default ScheduleForm;

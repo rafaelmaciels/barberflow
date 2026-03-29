@@ -1,9 +1,53 @@
 import { useState } from "react";
+import api from "../services/api";
 
 export default function Home() {
   const [name, setName] = useState("");
   const [service, setService] = useState("");
   const [time, setTime] = useState("");
+
+  async function handleSubmit() {
+    console.log("🔥 Clique funcionando");
+
+    if (!name || !service || !time) {
+      alert("Preencha todos os campos");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${api.baseURL}/appointments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          nome_cliente: name,
+          id_servico: service,
+          id_horario: time,
+          data_agendamento: new Date().toISOString().split("T")[0]
+        })
+      });
+
+      const data = await response.json();
+
+      console.log("📥 Resposta:", data);
+
+      if (data.success) {
+        alert("Agendamento realizado!");
+
+        // limpar campos
+        setName("");
+        setService("");
+        setTime("");
+      } else {
+        alert(data.error || "Erro ao agendar");
+      }
+
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao conectar com o servidor");
+    }
+  }
 
   return (
     <div style={styles.container}>
@@ -41,14 +85,14 @@ export default function Home() {
           <option value="3">10:00</option>
         </select>
 
-        <button style={styles.button}>
+        {/* 🔥 AGORA FUNCIONA */}
+        <button style={styles.button} onClick={handleSubmit}>
           Agendar
         </button>
       </div>
     </div>
   );
 }
-
 const styles = {
   container: {
     height: "100vh",

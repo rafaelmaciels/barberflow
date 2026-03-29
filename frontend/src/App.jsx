@@ -8,9 +8,9 @@ function App() {
   const [page, setPage] = useState("home");
   const [authenticated, setAuthenticated] = useState(false);
 
-  // Verifica sessão ao abrir app
+  // 🔥 REMOVIDO BLOQUEIO INICIAL
   useEffect(() => {
-    checkAuth();
+    // checkAuth(); ← vamos testar sem isso primeiro
   }, []);
 
   async function checkAuth() {
@@ -19,13 +19,18 @@ function App() {
         credentials: "include"
       });
 
+      if (!res.ok) {
+        setAuthenticated(false);
+        return;
+      }
+
       const data = await res.json();
 
       if (data.authenticated) {
         setAuthenticated(true);
       }
-    } catch {
-      setAuthenticated(false);
+    } catch (error) {
+      console.log("Erro:", error.message);
     }
   }
 
@@ -39,12 +44,14 @@ function App() {
       {page === "home" && <Home />}
 
       {page === "admin" && (
-        authenticated
-          ? <Admin />
-          : <Login onLogin={() => {
-              setAuthenticated(true);
-              setPage("admin");
-            }} />
+        authenticated ? (
+          <Admin />
+        ) : (
+          <Login onLogin={() => {
+            setAuthenticated(true);
+            setPage("admin");
+          }} />
+        )
       )}
     </>
   );
