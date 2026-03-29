@@ -3,7 +3,13 @@
 // =========================
 // HEADERS (CORS + JSON)
 // =========================
-header("Access-Control-Allow-Origin: *");
+
+// ⚠️ NÃO usar "*" com sessão
+header("Access-Control-Allow-Origin: http://localhost:3000");
+
+// 🔥 ESSENCIAL para sessão funcionar no React
+header("Access-Control-Allow-Credentials: true");
+
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
@@ -30,6 +36,9 @@ $request = str_replace('/backend', '', $request);
 
 // Remove index.php
 $request = str_replace('/index.php', '', $request);
+
+// 🔥 Remove barra final (evita erro tipo /services/)
+$request = rtrim($request, '/');
 
 // =========================
 // IMPORTS CORRETOS
@@ -59,7 +68,6 @@ elseif ($request === '/appointments' && $method === 'GET') {
     getAppointments();
 }
 
-// 🔥 CANCELAR AGENDAMENTO (colocado no lugar correto)
 elseif ($request === '/appointments' && $method === 'PUT') {
     cancelAppointment();
 }
@@ -70,6 +78,22 @@ elseif ($request === '/settings' && $method === 'GET') {
 
 elseif ($request === '/settings' && $method === 'PUT') {
     updateSettings();
+}
+
+elseif ($request === '/dashboard' && $method === 'GET') {
+    getDashboard();
+}
+
+elseif ($request === '/login' && $method === 'POST') {
+    login();
+}
+
+elseif ($request === '/auth' && $method === 'GET') {
+    checkAuth();
+}
+
+elseif ($request === '/logout' && $method === 'POST') {
+    logout();
 }
 
 else {

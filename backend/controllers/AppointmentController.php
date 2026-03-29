@@ -143,3 +143,29 @@ function cancelAppointment() {
     }
 }
 
+// Função para retornar métricas do dia (faturamento + quantidade)
+function getDashboard() {
+    global $conn;
+    // Data recebida ou hoje
+    $date = $_GET['date'] ?? date('Y-m-d');
+
+    // Query com soma e contagem
+    $query = "
+        SELECT 
+            COUNT(a.id) AS total_atendimentos,
+            SUM(s.price) AS faturamento
+        FROM appointments a
+        JOIN services s ON a.service_id = s.id
+        WHERE a.appointment_date = '$date'
+        AND a.status = 'agendado'
+    ";
+
+    $result = $conn->query($query);
+    $data = $result->fetch_assoc();
+
+    echo json_encode([
+        "total" => intval($data['total_atendimentos']),
+        "faturamento" => floatval($data['faturamento'] ?? 0)
+    ]);
+}
+

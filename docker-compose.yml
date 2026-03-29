@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+
+  db:
+    image: mysql:8
+    container_name: barberflow_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: barberflow
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  backend:
+    build: ./backend
+    container_name: barberflow_backend
+    restart: always
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: barberflow_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
