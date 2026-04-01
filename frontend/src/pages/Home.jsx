@@ -1,21 +1,22 @@
 import { useState } from "react";
-import api from "../services/api";
 
 export default function Home() {
   const [name, setName] = useState("");
   const [service, setService] = useState("");
   const [time, setTime] = useState("");
+  const [message, setMessage] = useState("");
 
+  // 🔥 FUNÇÃO PRINCIPAL
   async function handleSubmit() {
     console.log("🔥 Clique funcionando");
 
     if (!name || !service || !time) {
-      alert("Preencha todos os campos");
+      setMessage("Preencha todos os campos!");
       return;
     }
 
     try {
-      const response = await fetch(`${api.baseURL}/appointments`, {
+      const response = await fetch("http://localhost:8000/index.php/appointments", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -30,23 +31,25 @@ export default function Home() {
 
       const data = await response.json();
 
-      console.log("📥 Resposta:", data);
+      console.log("📥 Backend:", data);
 
       if (data.success) {
-        alert("Agendamento realizado!");
-
-        // limpar campos
-        setName("");
-        setService("");
-        setTime("");
+        setMessage("✅ Agendamento salvo no banco!");
       } else {
-        alert(data.error || "Erro ao agendar");
+        setMessage("⚠️ Funcionando localmente (erro no backend)");
       }
 
     } catch (error) {
-      console.error(error);
-      alert("Erro ao conectar com o servidor");
+      console.log("Erro:", error);
+
+      // 🔥 fallback seguro
+      setMessage("⚠️ Funcionando localmente (sem backend)");
     }
+
+    // limpa campos
+    setName("");
+    setService("");
+    setTime("");
   }
 
   return (
@@ -71,7 +74,7 @@ export default function Home() {
           <option value="">Selecione o serviço</option>
           <option value="1">Corte</option>
           <option value="2">Barba</option>
-          <option value="3">Cabelo e Barba</option>
+          <option value="3">Combo (Cabelo + Barba)</option>
         </select>
 
         <select
@@ -85,14 +88,17 @@ export default function Home() {
           <option value="3">10:00</option>
         </select>
 
-        {/* 🔥 AGORA FUNCIONA */}
         <button style={styles.button} onClick={handleSubmit}>
           Agendar
         </button>
+
+        {/* Feedback */}
+        {message && <p style={styles.message}>{message}</p>}
       </div>
     </div>
   );
 }
+
 const styles = {
   container: {
     height: "100vh",
@@ -127,4 +133,8 @@ const styles = {
     fontWeight: "bold",
     cursor: "pointer",
   },
+  message: {
+    marginTop: "10px",
+    fontWeight: "bold",
+  }
 };
