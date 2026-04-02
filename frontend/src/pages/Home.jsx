@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../services/api";
+import { formatBrazilWeekdayAndDate, getBrazilISODate } from "../utils/dateTime";
 
 const SERVICE_OPTIONS = [
   { value: "1", label: "Corte" },
@@ -44,15 +45,10 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [timeSlots, setTimeSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(true);
-  const [currentDate, setCurrentDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [currentDate, setCurrentDate] = useState(() => getBrazilISODate());
 
   const currentDateLabel = useMemo(() => {
-    const [year, month, day] = currentDate.split("-").map(Number);
-    const date = new Date(year, month - 1, day);
-    const weekday = new Intl.DateTimeFormat("pt-BR", { weekday: "long" }).format(date);
-    const formattedWeekday = `${weekday.charAt(0).toUpperCase()}${weekday.slice(1)}`;
-    const formattedDate = new Intl.DateTimeFormat("pt-BR").format(date);
-    return `${formattedWeekday} ${formattedDate}`;
+    return formatBrazilWeekdayAndDate(currentDate);
   }, [currentDate]);
 
   useEffect(() => {
@@ -61,7 +57,7 @@ export default function Home() {
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      const nowDate = new Date().toISOString().split("T")[0];
+      const nowDate = getBrazilISODate();
       setCurrentDate((previousDate) => {
         if (previousDate !== nowDate) {
           setTime("");

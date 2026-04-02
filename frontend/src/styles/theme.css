@@ -1,0 +1,42 @@
+:root {
+  --bf-bg: #f8f9fb;
+  --bf-card: #ffffff;
+  --bf-border: #e9ecef;
+  --bf-text: #212529;
+  --bf-subtext: #6c757d;
+}
+
+body {
+  background: linear-gradient(180deg, #f8f9fb 0%, #eef2f6 100%);
+  color: var(--bf-text);
+}
+
+.app-bg {
+  background: linear-gradient(180deg, #f8f9fb 0%, #eef2f6 100%);
+}
+
+.hero-modern {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(13, 110, 253, 0.08), transparent 30%),
+    radial-gradient(circle at 80% 0%, rgba(13, 110, 253, 0.1), transparent 26%);
+}
+
+.login-section {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  align-items: center;
+}
+
+.modern-card {
+  background: var(--bf-card);
+  border: 1px solid var(--bf-border) !important;
+  border-radius: 1rem;
+}
+
+.text-secondary {
+  color: var(--bf-subtext) !important;
+}
+
+.confirmation-message {
+  white-space: pre-line;
+}

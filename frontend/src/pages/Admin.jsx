@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import { getBrazilISODate } from "../utils/dateTime";
 
 export default function Admin() {
   const [appointments, setAppointments] = useState([]);
@@ -8,199 +9,141 @@ export default function Admin() {
     faturamento: 0
   });
 
-  const [date, setDate] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const [date, setDate] = useState(getBrazilISODate());
 
-  // 🔄 Carrega dados ao abrir ou mudar data
+  // 🔥 Carrega dados
   useEffect(() => {
     loadAppointments();
     loadDashboard();
   }, [date]);
 
-  // 📦 Buscar agendamentos (PROTEGIDO)
-  async function loadAppointments() {
-    try {
-      const res = await fetch(`${api.baseURL}/appointments?date=${date}`, {
-        credentials: "include" // 🔥 ESSENCIAL
-      });
-
-      // Se não autorizado → logout automático
-      if (res.status === 401) {
-        window.location.reload();
-        return;
-      }
-
-      const data = await res.json();
-      setAppointments(data);
-
-    } catch (error) {
-      console.error("Erro ao carregar agendamentos");
-    }
-  }
-
-  // 📊 Buscar dashboard (PROTEGIDO)
-  async function loadDashboard() {
-    try {
-      const res = await fetch(`${api.baseURL}/dashboard?date=${date}`, {
-        credentials: "include" // 🔥 ESSENCIAL
-      });
-
-      if (res.status === 401) {
-        window.location.reload();
-        return;
-      }
-
-      const data = await res.json();
-      setDashboard(data);
-
-    } catch (error) {
-      console.error("Erro ao carregar dashboard");
-    }
-  }
-
-  // 🚪 Logout
   async function handleLogout() {
-    await fetch(`${api.baseURL}/logout`, {
-      method: "POST",
-      credentials: "include"
-    });
+  await api.logout();
+  window.location.reload();
+  }
 
-    window.location.reload();
+  // 📋 Buscar agendamentos
+  async function loadAppointments() {
+    const res = await fetch(`${api.baseURL}/appointments?date=${date}`);
+    const data = await res.json();
+    setAppointments(data);
+  }
+
+  // 💰 Buscar dashboard
+  async function loadDashboard() {
+    const res = await fetch(`${api.baseURL}/dashboard?date=${date}`);
+    const data = await res.json();
+    setDashboard(data);
   }
 
   // ❌ Cancelar agendamento
   async function cancelAppointment(id) {
-    const confirmCancel = window.confirm("Deseja cancelar este agendamento?");
+    const confirmCancel = window.confirm("Cancelar agendamento?");
     if (!confirmCancel) return;
 
-    try {
-      await fetch(`${api.baseURL}/appointments`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include", // 🔥 ESSENCIAL
-        body: JSON.stringify({ id })
-      });
+    await fetch(`${api.baseURL}/appointments`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ id })
+    });
 
-      // Atualiza dados
-      loadAppointments();
-      loadDashboard();
-
-    } catch (error) {
-      alert("Erro ao cancelar agendamento");
-    }
+    loadAppointments();
+    loadDashboard();
   }
 
   return (
-    <div style={styles.container}>
-      <h1>💈 Painel Admin</h1>
-
-      {/* 🔥 BOTÃO LOGOUT */}
-      <button onClick={handleLogout} style={styles.logoutBtn}>
-        Sair
-      </button>
-
-      {/* 📊 DASHBOARD */}
-      <div style={styles.dashboard}>
-        <div style={styles.card}>
-          <h3>Atendimentos</h3>
-          <p>{dashboard.total}</p>
+    <section className="py-5">
+      <div className="container">
+        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+          <div>
+            <h1 className="h3 fw-bold mb-1">Painel Admin</h1>
+            <p className="text-secondary mb-0">Visão diária de agendamentos e faturamento</p>
+          </div>
+          <button onClick={handleLogout} className="btn btn-outline-dark">
+            Sair
+          </button>
         </div>
 
-        <div style={styles.card}>
-          <h3>Faturamento</h3>
-          <p>R$ {dashboard.faturamento}</p>
+        <div className="row g-3 mb-4">
+          <div className="col-md-6">
+            <div className="card border-0 shadow-sm modern-card h-100">
+              <div className="card-body">
+                <p className="text-uppercase small text-secondary mb-2">Atendimentos</p>
+                <h3 className="mb-0 fw-bold">{dashboard.total}</h3>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-6">
+            <div className="card border-0 shadow-sm modern-card h-100">
+              <div className="card-body">
+                <p className="text-uppercase small text-secondary mb-2">Faturamento</p>
+                <h3 className="mb-0 fw-bold">R$ {dashboard.faturamento}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card border-0 shadow-sm modern-card">
+          <div className="card-body">
+            <div className="row align-items-end mb-3">
+              <div className="col-sm-6 col-md-4 col-lg-3">
+                <label className="form-label fw-semibold">Filtrar por data</label>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="form-control"
+                />
+              </div>
+            </div>
+
+            <div className="table-responsive">
+              <table className="table align-middle mb-0">
+                <thead className="table-light">
+                  <tr>
+                    <th>Hora</th>
+                    <th>Cliente</th>
+                    <th>Serviço</th>
+                    <th>Valor</th>
+                    <th className="text-end">Ação</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {appointments.length > 0 ? (
+                    appointments.map((a) => (
+                      <tr key={a.id}>
+                        <td>{a.time}</td>
+                        <td>{a.client_name}</td>
+                        <td>{a.service}</td>
+                        <td>R$ {a.price}</td>
+
+                        <td className="text-end">
+                          <button
+                            onClick={() => cancelAppointment(a.id)}
+                            className="btn btn-sm btn-outline-danger"
+                          >
+                            Cancelar
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="5" className="text-center text-secondary py-4">
+                        Nenhum agendamento
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* 📅 Filtro */}
-      <input
-        type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-      />
-
-      {/* 📋 Tabela */}
-      <table style={styles.table}>
-        <thead>
-          <tr>
-            <th>Hora</th>
-            <th>Cliente</th>
-            <th>Serviço</th>
-            <th>Valor</th>
-            <th>Ação</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {appointments.length > 0 ? (
-            appointments.map((a) => (
-              <tr key={a.id}>
-                <td>{a.time}</td>
-                <td>{a.client_name}</td>
-                <td>{a.service}</td>
-                <td>R$ {a.price}</td>
-                <td>
-                  <button
-                    onClick={() => cancelAppointment(a.id)}
-                    style={styles.cancelBtn}
-                  >
-                    Cancelar
-                  </button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="5">Nenhum agendamento</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+    </section>
   );
 }
-
-// 🎨 Estilos
-const styles = {
-  container: {
-    padding: "20px",
-    background: "#111",
-    color: "#fff",
-    minHeight: "100vh"
-  },
-  dashboard: {
-    display: "flex",
-    gap: "10px",
-    margin: "20px 0"
-  },
-  card: {
-    background: "#1c1c1c",
-    padding: "15px",
-    borderRadius: "8px"
-  },
-  table: {
-    width: "100%",
-    marginTop: "20px",
-    borderCollapse: "collapse"
-  },
-  cancelBtn: {
-    background: "#d32f2f",
-    color: "#fff",
-    border: "none",
-    padding: "6px 10px",
-    cursor: "pointer",
-    borderRadius: "4px"
-  },
-  logoutBtn: {
-    marginBottom: "10px",
-    background: "#555",
-    color: "#fff",
-    border: "none",
-    padding: "6px 10px",
-    cursor: "pointer",
-    borderRadius: "4px"
-  }
-};

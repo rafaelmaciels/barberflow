@@ -1,13 +1,11 @@
 <?php
 
-// =========================
-// DEBUG (remova depois)
-// =========================
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
+date_default_timezone_set('America/Sao_Paulo');
 
 // =========================
-// HEADERS (CORS + JSON)
+// HEADERS
 // =========================
 header("Access-Control-Allow-Origin: http://localhost:3000");
 header("Access-Control-Allow-Credentials: true");
@@ -16,7 +14,7 @@ header("Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
 // =========================
-// PRE-FLIGHT (CORS)
+// PRE-FLIGHT
 // =========================
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -24,29 +22,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // =========================
-// CAPTURA REQUEST
+// REQUEST
 // =========================
-$request = $_SERVER['REQUEST_URI'];
+$request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Remove query string (?date=...)
-$request = parse_url($request, PHP_URL_PATH);
-
-// Remove /backend se existir
 $request = str_replace('/backend', '', $request);
-
-// Remove index.php
 $request = str_replace('/index.php', '', $request);
-
-// Remove barra final
 $request = rtrim($request, '/');
 
-// 🔥 Se vier vazio, define rota padrão
 if ($request === '' || $request === null) {
     $request = '/services';
 }
 
-// Garante que começa com "/"
 if ($request[0] !== '/') {
     $request = '/' . $request;
 }
@@ -63,57 +51,57 @@ require_once __DIR__ . '/../controllers/AdminController.php';
 // ROTAS
 // =========================
 
-if ($request === '/services' && $method === 'GET') {
-    getServices();
-}
+switch (true) {
 
-elseif ($request === '/time-slots' && $method === 'GET') {
-    getTimeSlots();
-}
+    case $request === '/services' && $method === 'GET':
+        getServices();
+        break;
 
-elseif ($request === '/appointments' && $method === 'POST') {
-    createAppointment();
-}
+    case $request === '/time-slots' && $method === 'GET':
+        getTimeSlots();
+        break;
 
-elseif ($request === '/appointments' && $method === 'GET') {
-    getAppointments();
-}
+    case $request === '/appointments' && $method === 'POST':
+        createAppointment();
+        break;
 
-elseif ($request === '/appointments' && $method === 'PUT') {
-    cancelAppointment();
-}
+    case $request === '/appointments' && $method === 'GET':
+        getAppointments();
+        break;
 
-elseif ($request === '/settings' && $method === 'GET') {
-    getSettings();
-}
+    case $request === '/appointments' && $method === 'PUT':
+        cancelAppointment();
+        break;
 
-elseif ($request === '/settings' && $method === 'PUT') {
-    updateSettings();
-}
+    case $request === '/settings' && $method === 'GET':
+        getSettings();
+        break;
 
-elseif ($request === '/dashboard' && $method === 'GET') {
-    getDashboard();
-}
+    case $request === '/settings' && $method === 'PUT':
+        updateSettings();
+        break;
 
-elseif ($request === '/login' && $method === 'POST') {
-    login();
-}
+    case $request === '/dashboard' && $method === 'GET':
+        getDashboard();
+        break;
 
-elseif ($request === '/auth' && $method === 'GET') {
-    checkAuth();
-}
+    case $request === '/login' && $method === 'POST':
+        login();
+        break;
 
-elseif ($request === '/logout' && $method === 'POST') {
-    logout();
-}
+    case $request === '/auth' && $method === 'GET':
+        checkAuth();
+        break;
 
-else {
-    http_response_code(404);
-    echo json_encode([
-        "error" => "Rota não encontrada",
-        "debug" => [
+    case $request === '/logout' && $method === 'POST':
+        logout();
+        break;
+
+    default:
+        http_response_code(404);
+        echo json_encode([
+            "error" => "Rota não encontrada",
             "request" => $request,
             "method" => $method
-        ]
-    ]);
+        ]);
 }
