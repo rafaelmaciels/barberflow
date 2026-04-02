@@ -1,8 +1,9 @@
 # 🚀 BarberFlow - Guia de Deploy via FTP
 
-**Data:** 2 de abril de 2026  
 **Servidor:** https://rafaelmaciel.net/sistemas/barberflow  
 **Credenciais do Banco:** ✅ Já configuradas  
+**Servidor Web:** LiteSpeed ✅  
+**Estrutura:** private_html ✅  
 
 ---
 
@@ -13,6 +14,15 @@
 - [x] Frontend build otimizado gerado
 - [x] URLs ajustadas para produção
 - [x] CORS configurado
+- [x] **Compatibilidade LiteSpeed implementada**
+
+### 🔧 Configurações Específicas para LiteSpeed
+
+**O servidor usa LiteSpeed (não Apache), então:**
+- ✅ .htaccess compatível com LiteSpeed
+- ✅ Headers CORS configurados no .htaccess
+- ✅ Estrutura private_html correta
+- ✅ Rewrite rules otimizadas
 
 ### 📦 Fase 2: Upload via FTP (PRÓXIMO PASSO)
 
@@ -22,9 +32,9 @@
 - **Senha:** (sua senha FTP)
 - **Porta:** 21 (padrão)
 
-#### Estrutura no Servidor
+#### Estrutura no Servidor (ATUALIZADO - private_html)
 ```
-public_html/
+private_html/  ← CORREÇÃO: private_html (não public_html)
 └── sistemas/
     └── barberflow/
         ├── index.html
@@ -40,6 +50,7 @@ public_html/
             ├── index.php
             ├── .htaccess
             ├── test_db.php
+            ├── test_php.php
             ├── config/
             │   └── database.php ✅
             ├── controllers/
@@ -48,6 +59,10 @@ public_html/
             │   ├── ServiceController.php
             │   └── TimeSlotController.php
             ├── models/
+            │   ├── Appointment.php
+            │   └── Service.php
+            └── routes/
+                └── api.php
             │   ├── Appointment.php
             │   └── Service.php
             └── routes/
@@ -71,14 +86,14 @@ public_html/
 5. Conecte
 
 ### Passo 2: Navegar até a pasta de destino
-1. No painel direito (servidor), navegue até: `public_html/sistemas/barberflow`
+1. No painel direito (servidor), navegue até: `private_html/sistemas/barberflow`
 2. Se a pasta não existir, crie-a:
    - Clique direito → Criar diretório
    - Nome: `barberflow`
 
 ### Passo 3: Upload dos arquivos Frontend (Build)
 **Origem (local):** `/home/rafael/barberflow/frontend/build/`  
-**Destino (servidor):** `public_html/sistemas/barberflow/`
+**Destino (servidor):** `private_html/sistemas/barberflow/`
 
 **Arquivos a transferir:**
 - `index.html`
@@ -94,7 +109,7 @@ public_html/
 
 ### Passo 4: Upload da pasta Backend
 **Origem (local):** `/home/rafael/barberflow/backend/`  
-**Destino (servidor):** `public_html/sistemas/barberflow/backend/`
+**Destino (servidor):** `private_html/sistemas/barberflow/backend/`
 
 **Instruções:**
 1. No painel direito, crie uma pasta `backend` (se não existir)
@@ -186,7 +201,7 @@ Se o teste PHP não funcionar:
 ##### 5. Verificar Estrutura de Pastas
 Certifique-se de que:
 ```
-public_html/
+private_html/
 └── sistemas/
     └── barberflow/        ← Permissões 755
         ├── index.html     ← Permissões 644

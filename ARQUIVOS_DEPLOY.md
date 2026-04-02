@@ -2,7 +2,7 @@
 
 ## 📦 Frontend Build (Pronto para Upload)
 **Localização local:** `/home/rafael/barberflow/frontend/build/`  
-**Destino no servidor:** `public_html/sistemas/barberflow/`
+**Destino no servidor:** `private_html/sistemas/barberflow/`
 
 ### Arquivos do Build:
 ```
@@ -22,7 +22,7 @@ build/
 
 ## 🔧 Backend (Pronto para Upload)
 **Localização local:** `/home/rafael/barberflow/backend/`  
-**Destino no servidor:** `public_html/sistemas/barberflow/backend/`
+**Destino no servidor:** `private_html/sistemas/barberflow/backend/`
 
 ### Arquivos do Backend:
 ```

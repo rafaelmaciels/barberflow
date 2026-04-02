@@ -1,12 +1,7 @@
 Options -Indexes
 DirectoryIndex index.php
 
-# Permite acesso aos arquivos PHP
-<Files *.php>
-    Require all granted
-</Files>
-
-# Para servidores que suportam mod_rewrite
+# LiteSpeed e Apache compatibility
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /sistemas/barberflow/backend/
@@ -23,4 +18,12 @@ DirectoryIndex index.php
 # Fallback para servidores sem mod_rewrite
 <IfModule !mod_rewrite.c>
     ErrorDocument 404 /sistemas/barberflow/backend/index.php
+</IfModule>
+
+# Headers para API
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "https://rafaelmaciel.net"
+    Header set Access-Control-Allow-Credentials "true"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
 </IfModule>
