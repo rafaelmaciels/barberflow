@@ -1,29 +1,16 @@
+# LiteSpeed - Versão Simplificada
 Options -Indexes
-DirectoryIndex index.php
 
-# LiteSpeed e Apache compatibility
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteBase /sistemas/barberflow/backend/
-
-    # Permite acesso direto a arquivos existentes
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
-    RewriteRule ^ - [L]
-
-    # Roteia tudo para index.php
-    RewriteRule ^(.*)$ index.php [QSA,L]
-</IfModule>
-
-# Fallback para servidores sem mod_rewrite
-<IfModule !mod_rewrite.c>
-    ErrorDocument 404 /sistemas/barberflow/backend/index.php
-</IfModule>
-
-# Headers para API
+# Headers básicos
 <IfModule mod_headers.c>
     Header set Access-Control-Allow-Origin "https://rafaelmaciel.net"
     Header set Access-Control-Allow-Credentials "true"
     Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
     Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>
+
+# Rewrite básico (se suportado)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^$ index.php [L]
 </IfModule>

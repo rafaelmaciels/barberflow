@@ -180,62 +180,48 @@ ls -la /home/rafael/barberflow/frontend/build/
 
 ### ❌ Problema: "403 Forbidden - Access to this resource on the server is denied!"
 
-#### Possíveis Causas:
-1. **Permissões incorretas** nos arquivos/pastas
-2. **.htaccess** muito restritivo
-3. **Servidor não suporta** certas configurações
-4. **Pasta backend** bloqueada
+#### ✅ SOLUÇÕES DEFINITIVAS (faça nesta ordem):
 
-#### ✅ Soluções (faça na ordem):
+##### **PASSO 1: Testar SEM .htaccess**
+1. **Via FTP:** Renomeie `.htaccess` para `.htaccess.bak` na pasta `backend/`
+2. **Teste:** Acesse `https://rafaelmaciel.net/sistemas/barberflow/backend/test_php.php`
+3. **Resultado esperado:** Deve funcionar e mostrar JSON
+4. **Se funcionar:** O problema é o `.htaccess` - use a versão minimal
 
-##### 1. Ajustar Permissões via FTP
-**No FileZilla:**
-1. Clique direito na pasta `barberflow` → **Permissões de arquivo**
-2. Marque:
-   - **Proprietário:** Leitura, Escrita, Execução
-   - **Grupo:** Leitura, Execução
-   - **Público:** Leitura, Execução
-3. **Valor numérico:** 755
-4. Aplique recursivamente
+##### **PASSO 2: Usar .htaccess Minimal**
+1. **Via FTP:** Delete o `.htaccess` atual
+2. **Upload:** Envie o arquivo `.htaccess.minimal` como `.htaccess`
+3. **Teste novamente**
 
-**Para arquivos PHP:**
-- Permissões: 644 (Leitura + Escrita para proprietário, Leitura para outros)
+##### **PASSO 3: Verificar Permissões (CRÍTICO)**
+**No FileZilla - para TODAS as pastas:**
+1. Clique direito na pasta → **Permissões de arquivo**
+2. **Configuração correta:**
+   - **Proprietário:** ✅ Leitura, ✅ Escrita, ✅ Execução
+   - **Grupo:** ✅ Leitura, ❌ Escrita, ✅ Execução
+   - **Público:** ✅ Leitura, ❌ Escrita, ✅ Execução
+3. **Valor numérico:** `755`
+4. ✅ **Aplicar recursivamente** (importante!)
 
-##### 2. Testar PHP Básico
-1. Acesse: `https://rafaelmaciel.net/sistemas/barberflow/backend/test_php.php`
-2. Deve retornar JSON com informações do servidor
-3. Se funcionar → problema é no index.php ou rotas
-4. Se não funcionar → problema de permissões ou PHP desabilitado
+**Para arquivos PHP (.php):**
+- **Permissões:** `644`
+- **Proprietário:** ✅ Leitura, ✅ Escrita
+- **Grupo/Público:** ✅ Leitura
 
-##### 3. Verificar .htaccess
-Se o teste PHP não funcionar:
-1. **Renomeie** `.htaccess` para `.htaccess.bak` via FTP
-2. Teste novamente o `test_php.php`
-3. Se funcionar → problema no .htaccess
-4. Se não → problema de permissões ou configuração do servidor
+##### **PASSO 4: Teste Passo-a-Passo**
+1. **Teste PHP básico:** `https://rafaelmaciel.net/sistemas/barberflow/backend/test_php.php`
+2. **Teste index.php:** `https://rafaelmaciel.net/sistemas/barberflow/backend/index.php`
+3. **Teste API:** `https://rafaelmaciel.net/sistemas/barberflow/backend/index.php/services`
 
-##### 4. Testar Index.php Direto
-1. Acesse: `https://rafaelmaciel.net/sistemas/barberflow/backend/index.php`
-2. Deve retornar erro JSON (não 403)
-3. Se retornar 403 → arquivo index.php com permissões incorretas
-
-##### 5. Verificar Estrutura de Pastas
-Certifique-se de que:
+##### **PASSO 5: Contatar Suporte (se necessário)**
+Se nada funcionar, contate o suporte com:
 ```
-private_html/
-└── sistemas/
-    └── barberflow/        ← Permissões 755
-        ├── index.html     ← Permissões 644
-        ├── backend/       ← Permissões 755
-        │   ├── index.php  ← Permissões 644
-        │   └── .htaccess  ← Permissões 644
-        └── static/        ← Permissões 755
+"Erro 403 Forbidden em arquivos PHP - Hospedagem LiteSpeed
+- PHP 8.3.21 funcionando
+- Estrutura: private_html/sistemas/barberflow/
+- Permissões: pastas 755, arquivos 644
+- Mesmo sem .htaccess dá erro
 ```
-
-##### 6. Contatar Suporte (se necessário)
-Se nada funcionar, contate o suporte do seu provedor com:
-- "Erro 403 ao acessar arquivos PHP em hospedagem compartilhada"
-- Mencione que outros sites funcionam normalmente
 
 ---
 

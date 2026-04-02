@@ -45,7 +45,8 @@ npm run build
 ```
 backend/
 ├── index.php ⭐
-├── .htaccess ⭐ (ATUALIZADO - mais compatível)
+├── .htaccess ⭐ (ATUALIZADO - LiteSpeed simplificado)
+├── .htaccess.minimal ⭐ (NOVO - versão mínima para teste 403)
 ├── test_db.php ⭐
 ├── test_php.php ⭐ (NOVO - diagnóstico)
 ├── config/
