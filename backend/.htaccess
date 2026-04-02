@@ -1,6 +1,26 @@
-RewriteEngine On
+Options -Indexes
+DirectoryIndex index.php
 
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+# Permite acesso aos arquivos PHP
+<Files *.php>
+    Require all granted
+</Files>
 
-RewriteRule ^(.*)$ index.php [QSA,L]
+# Para servidores que suportam mod_rewrite
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /sistemas/barberflow/backend/
+
+    # Permite acesso direto a arquivos existentes
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Roteia tudo para index.php
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+# Fallback para servidores sem mod_rewrite
+<IfModule !mod_rewrite.c>
+    ErrorDocument 404 /sistemas/barberflow/backend/index.php
+</IfModule>

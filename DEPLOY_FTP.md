@@ -140,15 +140,78 @@ public_html/
 
 ---
 
-## 🐛 Troubleshooting
+## 🐛 Troubleshooting - Erro 403 Forbidden
 
-| Problema | Solução |
-|----------|---------|
-| **Erro 404 na raiz** | Verifique se `index.html` está em `public_html/sistemas/barberflow/` |
-| **API retorna erro de conexão** | Verifique `backend/config/database.php` e credenciais no phpMyAdmin |
-| **CORS error no console** | Certifique-se de que o backend está em `backend/index.php` |
-| **Arquivo .htaccess não funciona** | Peça ao seu provedor para habilitar `mod_rewrite` |
-| **Permissão negada ao enviar** | Ajuste permissões das pastas (CHMOD 755 para pastas, 644 para arquivos) |
+### ❌ Problema: "403 Forbidden - Access to this resource on the server is denied!"
+
+#### Possíveis Causas:
+1. **Permissões incorretas** nos arquivos/pastas
+2. **.htaccess** muito restritivo
+3. **Servidor não suporta** certas configurações
+4. **Pasta backend** bloqueada
+
+#### ✅ Soluções (faça na ordem):
+
+##### 1. Ajustar Permissões via FTP
+**No FileZilla:**
+1. Clique direito na pasta `barberflow` → **Permissões de arquivo**
+2. Marque:
+   - **Proprietário:** Leitura, Escrita, Execução
+   - **Grupo:** Leitura, Execução
+   - **Público:** Leitura, Execução
+3. **Valor numérico:** 755
+4. Aplique recursivamente
+
+**Para arquivos PHP:**
+- Permissões: 644 (Leitura + Escrita para proprietário, Leitura para outros)
+
+##### 2. Testar PHP Básico
+1. Acesse: `https://rafaelmaciel.net/sistemas/barberflow/backend/test_php.php`
+2. Deve retornar JSON com informações do servidor
+3. Se funcionar → problema é no index.php ou rotas
+4. Se não funcionar → problema de permissões ou PHP desabilitado
+
+##### 3. Verificar .htaccess
+Se o teste PHP não funcionar:
+1. **Renomeie** `.htaccess` para `.htaccess.bak` via FTP
+2. Teste novamente o `test_php.php`
+3. Se funcionar → problema no .htaccess
+4. Se não → problema de permissões ou configuração do servidor
+
+##### 4. Testar Index.php Direto
+1. Acesse: `https://rafaelmaciel.net/sistemas/barberflow/backend/index.php`
+2. Deve retornar erro JSON (não 403)
+3. Se retornar 403 → arquivo index.php com permissões incorretas
+
+##### 5. Verificar Estrutura de Pastas
+Certifique-se de que:
+```
+public_html/
+└── sistemas/
+    └── barberflow/        ← Permissões 755
+        ├── index.html     ← Permissões 644
+        ├── backend/       ← Permissões 755
+        │   ├── index.php  ← Permissões 644
+        │   └── .htaccess  ← Permissões 644
+        └── static/        ← Permissões 755
+```
+
+##### 6. Contatar Suporte (se necessário)
+Se nada funcionar, contate o suporte do seu provedor com:
+- "Erro 403 ao acessar arquivos PHP em hospedagem compartilhada"
+- Mencione que outros sites funcionam normalmente
+
+---
+
+## 🔧 Arquivos Atualizados para Compatibilidade
+
+Os arquivos foram atualizados para melhor compatibilidade com hospedagens compartilhadas:
+
+- **.htaccess do backend:** Mais permissivo e com fallbacks
+- **.htaccess do frontend:** Configurado para SPA
+- **test_php.php:** Arquivo de diagnóstico
+
+**Faça upload novamente dos arquivos atualizados!**
 
 ---
 

@@ -10,6 +10,7 @@ build/
 ├── index.html ⭐
 ├── favicon.ico
 ├── asset-manifest.json ⭐
+├── .htaccess ⭐ (NOVO - para SPA)
 ├── static/
 │   ├── css/
 │   │   └── main.c32417dc.css ⭐
@@ -27,7 +28,9 @@ build/
 ```
 backend/
 ├── index.php ⭐
-├── .htaccess ⭐
+├── .htaccess ⭐ (ATUALIZADO - mais compatível)
+├── test_db.php ⭐
+├── test_php.php ⭐ (NOVO - diagnóstico)
 ├── config/
 │   └── database.php ✅ (credenciais configuradas)
 ├── controllers/
