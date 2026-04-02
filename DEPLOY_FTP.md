@@ -26,6 +26,28 @@
 
 ### 📦 Fase 2: Upload via FTP (PRÓXIMO PASSO)
 
+#### ✅ Verificação Pré-Upload
+**Antes de fazer o upload, confirme que tem todos os arquivos:**
+
+```bash
+# Verificar frontend build
+ls -la /home/rafael/barberflow/frontend/build/
+# ✅ Deve conter: index.html, .htaccess, asset-manifest.json, static/
+
+# Verificar backend
+ls -la /home/rafael/barberflow/backend/
+# ✅ Deve conter: index.php, .htaccess, config/, controllers/, etc.
+```
+
+**Se faltar algum arquivo:**
+```bash
+# Refazer o build do frontend
+cd /home/rafael/barberflow/frontend && npm run build
+
+# Verificar novamente
+ls -la /home/rafael/barberflow/frontend/build/
+```
+
 #### Servidor FTP
 - **Host:** (fornecido pelo seu provedor)
 - **Usuário:** (seu usuário FTP)
@@ -34,39 +56,38 @@
 
 #### Estrutura no Servidor (ATUALIZADO - private_html)
 ```
-private_html/  ← CORREÇÃO: private_html (não public_html)
+private_html/
 └── sistemas/
     └── barberflow/
-        ├── index.html
-        ├── favicon.ico (opcional)
-        ├── static/
+        ├── index.html ⭐
+        ├── .htaccess ⭐ (para SPA)
+        ├── asset-manifest.json ⭐
+        ├── static/ ⭐
         │   ├── css/
-        │   │   └── main.c32417dc.css
+        │   │   └── main.*.css ⭐
         │   └── js/
-        │       ├── main.af36d496.js
-        │       └── main.af36d496.js.LICENSE.txt
-        ├── asset-manifest.json
+        │       ├── main.*.js ⭐
+        │       └── main.*.js.LICENSE.txt
         └── backend/
-            ├── index.php
-            ├── .htaccess
-            ├── test_db.php
-            ├── test_php.php
+            ├── index.php ⭐
+            ├── .htaccess ⭐
+            ├── test_db.php ⭐
+            ├── test_php.php ⭐
             ├── config/
             │   └── database.php ✅
-            ├── controllers/
-            │   ├── AdminController.php
-            │   ├── AppointmentController.php
-            │   ├── ServiceController.php
-            │   └── TimeSlotController.php
-            ├── models/
-            │   ├── Appointment.php
-            │   └── Service.php
-            └── routes/
-                └── api.php
-            │   ├── Appointment.php
-            │   └── Service.php
-            └── routes/
-                └── api.php
+            ├── controllers/ ⭐
+            ├── models/ ⭐
+            └── routes/ ⭐
+```
+
+**📍 Localização dos arquivos no seu PC:**
+- Frontend build: `/home/rafael/barberflow/frontend/build/`
+- Backend: `/home/rafael/barberflow/backend/`
+
+**✅ Verificar se o build existe:**
+```bash
+ls -la /home/rafael/barberflow/frontend/build/
+# Deve mostrar: index.html, static/, asset-manifest.json, .htaccess
 ```
 
 ---
