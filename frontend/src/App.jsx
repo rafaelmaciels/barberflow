@@ -3,14 +3,16 @@ import Home from "./pages/Home";
 import Admin from "./pages/Admin";
 import Login from "./pages/Login";
 import api from "./services/api";
+import "./styles/theme.css";
 
 function App() {
   const [page, setPage] = useState("home");
   const [authenticated, setAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // 🔥 REMOVIDO BLOQUEIO INICIAL
+  // 🔐 Verifica sessão ao iniciar (sem quebrar app)
   useEffect(() => {
-    // checkAuth(); ← vamos testar sem isso primeiro
+    checkAuth();
   }, []);
 
   async function checkAuth() {
@@ -21,39 +23,72 @@ function App() {
 
       if (!res.ok) {
         setAuthenticated(false);
-        return;
-      }
-
-      const data = await res.json();
-
-      if (data.authenticated) {
-        setAuthenticated(true);
+      } else {
+        const data = await res.json();
+        setAuthenticated(!!data.authenticated);
       }
     } catch (error) {
-      console.log("Erro:", error.message);
+      console.log("Backend offline (ok por enquanto)");
+      setAuthenticated(false);
+    } finally {
+      setLoading(false);
     }
   }
 
-  return (
-    <>
-      <div style={{ padding: 10 }}>
-        <button onClick={() => setPage("home")}>Cliente</button>
-        <button onClick={() => setPage("admin")}>Admin</button>
+  // 🔥 Loading evita bug de render
+  if (loading) {
+    return (
+      <div className="min-vh-100 d-flex align-items-center justify-content-center app-bg">
+        <div className="text-center">
+          <div className="spinner-border text-primary mb-3" role="status" aria-hidden="true"></div>
+          <p className="mb-0 text-muted">Carregando...</p>
+        </div>
       </div>
+    );
+  }
 
-      {page === "home" && <Home />}
+  return (
+    <div className="app-bg min-vh-100">
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div className="container py-1">
+          <span className="navbar-brand fw-semibold">💈 BarberFlow</span>
 
-      {page === "admin" && (
-        authenticated ? (
-          <Admin />
-        ) : (
-          <Login onLogin={() => {
-            setAuthenticated(true);
-            setPage("admin");
-          }} />
-        )
-      )}
-    </>
+          <div className="d-flex gap-2 ms-auto">
+            <button
+              onClick={() => setPage("home")}
+              className={`btn btn-sm ${page === "home" ? "btn-primary" : "btn-outline-light"}`}
+            >
+              Cliente
+            </button>
+            <button
+              onClick={() => setPage("admin")}
+              className={`btn btn-sm ${page === "admin" ? "btn-primary" : "btn-outline-light"}`}
+            >
+              Admin
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <main>
+        {/* CLIENTE */}
+        {page === "home" && <Home />}
+
+        {/* ADMIN */}
+        {page === "admin" && (
+          authenticated ? (
+            <Admin />
+          ) : (
+            <Login
+              onLogin={() => {
+                setAuthenticated(true);
+                setPage("admin");
+              }}
+            />
+          )
+        )}
+      </main>
+    </div>
   );
 }
 

@@ -20,25 +20,75 @@ function generateRangeSlots($startHour, $startMinute, $endHour, $endMinute, $ste
     return $slots;
 }
 
+function runDailyResetIfNeeded($conn) {
+    $currentTime = date('H:i');
+    if ($currentTime < '00:01') {
+        return;
+    }
+
+    $today = date('Y-m-d');
+    $resetFlagPath = sys_get_temp_dir() . '/barberflow_daily_reset_' . $today . '.flag';
+
+    if (file_exists($resetFlagPath)) {
+        return;
+    }
+
+    $stmtReset = $conn->prepare("
+        UPDATE appointments
+        SET status = 'cancelado'
+        WHERE appointment_date < ?
+        AND status = 'agendado'
+    ");
+    $stmtReset->bind_param('s', $today);
+    $stmtReset->execute();
+
+    file_put_contents($resetFlagPath, date('c'));
+}
+
+function ensureTimeSlotsExist($conn, $expectedSlots) {
+    $resultExisting = $conn->query("
+        SELECT TIME_FORMAT(time, '%H:%i') AS time
+        FROM time_slots
+    ");
+
+    $existingMap = [];
+    while ($row = $resultExisting->fetch_assoc()) {
+        $existingMap[$row['time']] = true;
+    }
+
+    $stmtInsert = $conn->prepare("
+        INSERT INTO time_slots (time, available)
+        VALUES (?, 1)
+    ");
+
+    foreach ($expectedSlots as $slotTime) {
+        if (isset($existingMap[$slotTime])) {
+            continue;
+        }
+
+        $stmtInsert->bind_param('s', $slotTime);
+        $stmtInsert->execute();
+    }
+}
+
 function getTimeSlots() {
     $conn = getConnection();
     $date = $_GET['date'] ?? date('Y-m-d');
+
+    runDailyResetIfNeeded($conn);
 
     $morningSlots = generateRangeSlots(8, 0, 12, 0);
     $afternoonSlots = generateRangeSlots(13, 30, 18, 0);
     $expectedSlots = array_merge($morningSlots, $afternoonSlots);
 
-    $timePlaceholders = implode(',', array_fill(0, count($expectedSlots), '?'));
+    ensureTimeSlotsExist($conn, $expectedSlots);
 
     $querySlots = "
         SELECT id, TIME_FORMAT(time, '%H:%i') AS time
         FROM time_slots
-        WHERE TIME_FORMAT(time, '%H:%i') IN ($timePlaceholders)
     ";
 
     $stmtSlots = $conn->prepare($querySlots);
-    $types = str_repeat('s', count($expectedSlots));
-    $stmtSlots->bind_param($types, ...$expectedSlots);
     $stmtSlots->execute();
     $resultSlots = $stmtSlots->get_result();
 

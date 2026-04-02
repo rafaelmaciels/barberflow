@@ -16,8 +16,12 @@ Criar uma aplicação realista para portfólio que resolva um problema comum: or
   - Corte de cabelo
   - Barba
   - Combo (cabelo + barba)
+- Navbar com identidade visual `💈 BarberFlow`
+- Favicon com emoji `💈`
 - Escolha de horários disponíveis em intervalos de 30 minutos
 - Horários de atendimento: 08h00 às 12h00 e 13h30 às 18h00
+- Título dinâmico de horários no formato:
+  - `Horário - Quarta-feira 01/04/2026`
 - Confirmação de agendamento
 
 ### 🔐 Administrador
@@ -122,6 +126,7 @@ Criar uma aplicação realista para portfólio que resolva um problema comum: or
 - Gerar horários dinamicamente em intervalos de 30 minutos nos períodos:
   - 08h00 às 12h00
   - 13h30 às 18h00
+- Executar rotina diária às 00h01 para reset de agendamentos antigos e liberação dos intervalos do novo dia
 - Bloquear agendamentos com a barbearia fechada
 - Impedir seleção de horários já ocupados
 - Validar dados do cliente

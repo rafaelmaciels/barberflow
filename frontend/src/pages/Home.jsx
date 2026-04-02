@@ -44,11 +44,35 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [timeSlots, setTimeSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(true);
-  const currentDate = useMemo(() => new Date().toISOString().split("T")[0], []);
+  const [currentDate, setCurrentDate] = useState(() => new Date().toISOString().split("T")[0]);
+
+  const currentDateLabel = useMemo(() => {
+    const [year, month, day] = currentDate.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
+    const weekday = new Intl.DateTimeFormat("pt-BR", { weekday: "long" }).format(date);
+    const formattedWeekday = `${weekday.charAt(0).toUpperCase()}${weekday.slice(1)}`;
+    const formattedDate = new Intl.DateTimeFormat("pt-BR").format(date);
+    return `${formattedWeekday} ${formattedDate}`;
+  }, [currentDate]);
 
   useEffect(() => {
     loadTimeSlots();
   }, [currentDate]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const nowDate = new Date().toISOString().split("T")[0];
+      setCurrentDate((previousDate) => {
+        if (previousDate !== nowDate) {
+          setTime("");
+          return nowDate;
+        }
+        return previousDate;
+      });
+    }, 30000);
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   async function loadTimeSlots() {
     setLoadingSlots(true);
@@ -178,7 +202,7 @@ export default function Home() {
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label">Horário</label>
+                  <label className="form-label">Horário - {currentDateLabel}</label>
                   <select
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
