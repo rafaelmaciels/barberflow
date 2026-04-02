@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8000/index.php";
+const BASE_URL = "https://rafaelmaciel.net/sistemas/barberflow/backend/index.php";
 
 const api = {
   baseURL: BASE_URL,

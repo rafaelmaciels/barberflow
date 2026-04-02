@@ -146,7 +146,76 @@ A aplicação será desenvolvida com foco em dispositivos móveis, garantindo um
 
 ---
 
-## 💡 Próximas melhorias
+## � Deploy em Servidor Compartilhado (FTP + phpMyAdmin)
+
+### Pré-requisitos
+- Servidor com suporte a PHP 7+ e MySQL
+- Acesso via FTP (FileZilla)
+- Acesso ao phpMyAdmin
+
+### Passo 1: Preparar o Banco de Dados
+1. Acesse o phpMyAdmin do seu servidor
+2. Crie um novo banco de dados chamado `barberflow`
+3. Selecione o banco criado
+4. Vá para a aba "Importar"
+5. Faça upload do arquivo `barberflow.sql` localizado na raiz do projeto
+6. Clique em "Executar" para criar as tabelas e inserir dados iniciais
+
+**Usuário admin padrão:**
+- Username: `admin`
+- Senha: `admin123`
+
+### Passo 2: Configurar Conexão com Banco
+1. Abra o arquivo `backend/config/database.php`
+2. Atualize as seguintes linhas com suas credenciais do MySQL:
+   ```php
+   $host = 'localhost'; // Geralmente 'localhost' em servidores compartilhados
+   $db   = 'barberflow'; // Nome do banco criado
+   $user = 'seu_usuario_mysql'; // Seu usuário MySQL
+   $pass = 'sua_senha_mysql';   // Sua senha MySQL
+   ```
+
+### Passo 3: Upload via FTP
+1. Abra o FileZilla e conecte ao seu servidor
+2. Navegue até a pasta `public_html` (ou equivalente)
+3. Crie a pasta `sistemas/barberflow` se não existir
+4. Faça upload dos seguintes arquivos e pastas:
+
+**Estrutura no servidor:**
+```
+public_html/
+└── sistemas/
+    └── barberflow/
+        ├── index.html          (do frontend/build/)
+        ├── static/             (do frontend/build/static/)
+        ├── asset-manifest.json (do frontend/build/)
+        └── backend/
+            ├── index.php
+            ├── .htaccess
+            ├── config/
+            │   └── database.php
+            ├── controllers/
+            ├── models/
+            └── routes/
+```
+
+**Arquivos específicos a enviar:**
+- Todo o conteúdo da pasta `frontend/build/` → `public_html/sistemas/barberflow/`
+- Toda a pasta `backend/` → `public_html/sistemas/barberflow/backend/`
+
+### Passo 4: Verificar Funcionamento
+1. Acesse `https://rafaelmaciel.net/sistemas/barberflow/`
+2. Teste o agendamento de um horário
+3. Acesse `https://rafaelmaciel.net/sistemas/barberflow/backend/index.php/login` para testar o admin
+
+### Notas Importantes
+- Certifique-se de que o servidor suporta `.htaccess` para o roteamento do backend
+- Se o host do MySQL for diferente de `localhost`, consulte seu provedor
+- O sistema já está configurado para usar caminhos relativos ao domínio informado
+
+---
+
+## �💡 Próximas melhorias
 
 - Dashboard administrativo completo
 - Filtro de agendamentos por data

@@ -7,7 +7,7 @@ date_default_timezone_set('America/Sao_Paulo');
 // =========================
 // HEADERS
 // =========================
-header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Access-Control-Allow-Origin: https://rafaelmaciel.net");
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS");
