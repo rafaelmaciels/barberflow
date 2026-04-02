@@ -16,7 +16,8 @@ Criar uma aplicação realista para portfólio que resolva um problema comum: or
   - Corte de cabelo
   - Barba
   - Combo (cabelo + barba)
-- Escolha de horários disponíveis
+- Escolha de horários disponíveis em intervalos de 30 minutos
+- Horários de atendimento: 08h00 às 12h00 e 13h30 às 18h00
 - Confirmação de agendamento
 
 ### 🔐 Administrador
@@ -117,6 +118,10 @@ Criar uma aplicação realista para portfólio que resolva um problema comum: or
 ## ⚙️ Regras de Negócio
 
 - Não permitir dois agendamentos no mesmo horário
+- Bloquear automaticamente no `select` os horários já agendados para a data
+- Gerar horários dinamicamente em intervalos de 30 minutos nos períodos:
+  - 08h00 às 12h00
+  - 13h30 às 18h00
 - Bloquear agendamentos com a barbearia fechada
 - Impedir seleção de horários já ocupados
 - Validar dados do cliente
