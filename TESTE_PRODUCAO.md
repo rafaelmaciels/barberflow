@@ -20,10 +20,17 @@
 
 ---
 
-### ✅ TESTE 2: API - Serviços
+### ✅ TESTE 2: API - Serviços (CORRIGIDO)
 - **URL:** `https://rafaelmaciel.net/sistemas/barberflow/backend/index.php/services`
 - **✅ Esperado:** JSON com lista de serviços
-- **❌ Problema:** Erro ou array vazio
+- **❌ Problema:** "Rota não encontrada" (corrigido no commit mais recente)
+
+**Correção aplicada:**
+```php
+// Em routes/api.php
+$request = str_replace('/backend', '', $request);
+$request = str_replace('/sistemas/barberflow', '', $request); // ← ADICIONADO
+```
 
 **Resposta esperada:**
 ```json
@@ -96,6 +103,13 @@
 
 ## 🐛 DIAGNÓSTICO DE PROBLEMAS
 
+### Se API retornar "Rota não encontrada":
+```
+❌ Problema: Path da URL não está sendo processado corretamente
+✅ Solução: Arquivo routes/api.php atualizado para remover /sistemas/barberflow
+✅ Status: CORRIGIDO no commit mais recente
+```
+
 ### Se Frontend não carregar:
 ```
 ❌ Problema: Arquivos não enviados ou permissões incorretas
@@ -113,6 +127,15 @@
 ❌ Problema: Credenciais incorretas no database.php
 ✅ Solução: Verificar arquivo backend/config/database.php
 ```
+
+---
+
+## 🔄 PRÓXIMOS PASSOS APÓS CORREÇÃO
+
+1. **Re-upload do backend** via FTP (arquivo `routes/api.php` atualizado)
+2. **Limpar cache** do navegador (Ctrl+F5)
+3. **Testar novamente** as URLs da API
+4. **Testar agendamento completo** no frontend
 
 ---
 
