@@ -55,3 +55,4 @@ test_db.php
 # =========================
 *.sql
 *.sqlite
+!barberflow.sql

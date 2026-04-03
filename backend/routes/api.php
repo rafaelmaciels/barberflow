@@ -4,10 +4,44 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 date_default_timezone_set('America/Sao_Paulo');
 
+function getAllowedOrigin() {
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    $allowedOrigins = [
+        'https://rafaelmaciel.net',
+        'http://localhost:3000'
+    ];
+
+    if (in_array($origin, $allowedOrigins, true)) {
+        return $origin;
+    }
+
+    return 'https://rafaelmaciel.net';
+}
+
+function normalizeRequestPath() {
+    $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    $scriptDir = rtrim(str_replace('\\', '/', dirname($scriptName)), '/');
+
+    if ($scriptDir !== '' && $scriptDir !== '/' && strpos($requestPath, $scriptDir) === 0) {
+        $requestPath = substr($requestPath, strlen($scriptDir));
+    }
+
+    $scriptBaseName = basename($scriptName);
+    if ($scriptBaseName !== '' && strpos($requestPath, '/' . $scriptBaseName) === 0) {
+        $requestPath = substr($requestPath, strlen('/' . $scriptBaseName));
+    }
+
+    $requestPath = '/' . ltrim((string) $requestPath, '/');
+    $requestPath = rtrim($requestPath, '/');
+
+    return $requestPath === '' ? '/services' : $requestPath;
+}
+
 // =========================
 // HEADERS
 // =========================
-header("Access-Control-Allow-Origin: https://rafaelmaciel.net");
+header("Access-Control-Allow-Origin: " . getAllowedOrigin());
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS");
@@ -24,21 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // =========================
 // REQUEST
 // =========================
-$request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$request = normalizeRequestPath();
 $method = $_SERVER['REQUEST_METHOD'];
-
-$request = str_replace('/backend', '', $request);
-$request = str_replace('/sistemas/barberflow', '', $request);
-$request = str_replace('/index.php', '', $request);
-$request = rtrim($request, '/');
-
-if ($request === '' || $request === null) {
-    $request = '/services';
-}
-
-if ($request[0] !== '/') {
-    $request = '/' . $request;
-}
 
 // =========================
 // IMPORTS

@@ -1,4 +1,19 @@
-const BASE_URL = "https://rafaelmaciel.net/sistemas/barberflow/backend/index.php";
+const APP_BASE_PATH = "/sistemas/barberflow";
+const LOCAL_API_BASE_PATH = "/backend/index.php";
+
+function resolveBasePath() {
+  if (typeof window === "undefined") {
+    return APP_BASE_PATH;
+  }
+
+  if (window.location.pathname.startsWith(APP_BASE_PATH)) {
+    return APP_BASE_PATH;
+  }
+
+  return "";
+}
+
+const BASE_URL = `${resolveBasePath()}${LOCAL_API_BASE_PATH}`;
 
 const api = {
   baseURL: BASE_URL,

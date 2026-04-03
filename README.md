@@ -146,76 +146,125 @@ A aplicação será desenvolvida com foco em dispositivos móveis, garantindo um
 
 ---
 
-## � Deploy em Servidor Compartilhado (FTP + phpMyAdmin)
+## Deploy em Servidor Compartilhado (FTP + phpMyAdmin)
 
-### Pré-requisitos
-- Servidor com suporte a PHP 7+ e MySQL
-- Acesso via FTP (FileZilla)
-- Acesso ao phpMyAdmin
+O projeto foi ajustado para publicar em `https://rafaelmaciel.net/sistemas/barberflow` sem depender de acesso SSH no servidor.
 
-### Passo 1: Preparar o Banco de Dados
-1. Acesse o phpMyAdmin do seu servidor
-2. Crie um novo banco de dados chamado `barberflow`
-3. Selecione o banco criado
-4. Vá para a aba "Importar"
-5. Faça upload do arquivo `barberflow.sql` localizado na raiz do projeto
-6. Clique em "Executar" para criar as tabelas e inserir dados iniciais
+### Estrutura de publicação
 
-**Usuário admin padrão:**
-- Username: `admin`
+Frontend publicado na raiz da pasta do sistema:
+`public_html/sistemas/barberflow/`
+
+Backend PHP publicado em:
+`public_html/sistemas/barberflow/backend/`
+
+### Passo 1: Gerar o frontend antes do upload
+
+No seu computador local, dentro do projeto:
+
+```bash
+cd frontend
+npm run build
+```
+
+Isso recria a pasta `frontend/build/` com os assets e links apontando para `/sistemas/barberflow/`.
+
+### Passo 2: Criar e importar o banco no phpMyAdmin
+
+1. Acesse o `phpMyAdmin` da hospedagem.
+2. Crie um banco MySQL novo.
+3. Selecione esse banco no menu lateral.
+4. Abra a aba `Importar`.
+5. Envie o arquivo [barberflow.sql](/home/rafael/barberflow/barberflow.sql).
+6. Clique em `Executar`.
+
+Usuário admin padrão após a importação:
+- Usuário: `admin`
 - Senha: `admin123`
 
-### Passo 2: Configurar Conexão com Banco
-1. Abra o arquivo `backend/config/database.php`
-2. Atualize as seguintes linhas com suas credenciais do MySQL:
-   ```php
-   $host = 'localhost'; // Geralmente 'localhost' em servidores compartilhados
-   $db   = 'barberflow'; // Nome do banco criado
-   $user = 'seu_usuario_mysql'; // Seu usuário MySQL
-   $pass = 'sua_senha_mysql';   // Sua senha MySQL
-   ```
+Observação:
+- Alguns provedores usam nomes com prefixo, como `usuario_barberflow`. Use exatamente o nome do banco criado no painel.
 
-### Passo 3: Upload via FTP
-1. Abra o FileZilla e conecte ao seu servidor
-2. Navegue até a pasta `public_html` (ou equivalente)
-3. Crie a pasta `sistemas/barberflow` se não existir
-4. Faça upload dos seguintes arquivos e pastas:
+### Passo 3: Atualizar credenciais do banco
 
-**Estrutura no servidor:**
+Edite o arquivo [database.php](/home/rafael/barberflow/backend/config/database.php) antes do upload ou diretamente no servidor e troque:
+
+```php
+$host = 'localhost';
+$db   = 'SEU_BANCO_MYSQL';
+$user = 'SEU_USUARIO_MYSQL';
+$pass = 'SUA_SENHA_MYSQL';
+$port = 3306;
 ```
+
+Na maioria das hospedagens compartilhadas:
+- `host` = `localhost`
+- `db` = nome do banco criado no painel
+- `user` = usuário MySQL criado no painel
+- `pass` = senha do usuário MySQL
+
+### Passo 4: Fazer deploy via FTP
+
+No FileZilla, conecte ao servidor e envie os arquivos para esta estrutura:
+
+```text
 public_html/
 └── sistemas/
     └── barberflow/
-        ├── index.html          (do frontend/build/)
-        ├── static/             (do frontend/build/static/)
-        ├── asset-manifest.json (do frontend/build/)
+        ├── index.html
+        ├── .htaccess
+        ├── asset-manifest.json
+        ├── static/
         └── backend/
             ├── index.php
             ├── .htaccess
+            ├── test_db.php
+            ├── test_php.php
             ├── config/
-            │   └── database.php
             ├── controllers/
             ├── models/
             └── routes/
 ```
 
-**Arquivos específicos a enviar:**
-- Todo o conteúdo da pasta `frontend/build/` → `public_html/sistemas/barberflow/`
-- Toda a pasta `backend/` → `public_html/sistemas/barberflow/backend/`
+Envie exatamente:
+- Todo o conteúdo de [frontend/build](/home/rafael/barberflow/frontend/build) para `public_html/sistemas/barberflow/`
+- A pasta [backend](/home/rafael/barberflow/backend) inteira para `public_html/sistemas/barberflow/backend/`
+- O arquivo [barberflow.sql](/home/rafael/barberflow/barberflow.sql) não precisa ficar publicado no site; ele é só para importação no `phpMyAdmin`
 
-### Passo 4: Verificar Funcionamento
-1. Acesse `https://rafaelmaciel.net/sistemas/barberflow/`
-2. Teste o agendamento de um horário
-3. Acesse `https://rafaelmaciel.net/sistemas/barberflow/backend/index.php/login` para testar o admin
+### Passo 5: Testar após o upload
 
-### Notas Importantes
-- Certifique-se de que o servidor suporta `.htaccess` para o roteamento do backend
-- Se o host do MySQL for diferente de `localhost`, consulte seu provedor
-- O sistema já está configurado para usar caminhos relativos ao domínio informado
+Teste estas URLs:
+
+1. Frontend:
+`https://rafaelmaciel.net/sistemas/barberflow/`
+
+2. API de serviços:
+`https://rafaelmaciel.net/sistemas/barberflow/backend/index.php/services`
+
+3. Diagnóstico PHP:
+`https://rafaelmaciel.net/sistemas/barberflow/backend/test_php.php`
+
+4. Diagnóstico do banco:
+`https://rafaelmaciel.net/sistemas/barberflow/backend/test_db.php`
+
+### Observações de compatibilidade
+
+- As rotas internas do frontend e do backend foram ajustadas para a subpasta `/sistemas/barberflow/`
+- O backend usa `.htaccess` para rotear requisições em `backend/`
+- Não há dependência de Docker, Nginx ou linha de comando no servidor de hospedagem
+- Se a hospedagem usar `public_html` ou `private_html`, mantenha a mesma estrutura final da URL pública
+
+### Comandos Git para salvar as alterações
+
+```bash
+git add .
+git commit -m "Deploy BarberFlow 💈 para servidor compartilhado com suporte a PHP/MySQL"
+git push origin main
+```
 
 ---
 
-## �💡 Próximas melhorias
+## Próximas melhorias
 
 - Dashboard administrativo completo
 - Filtro de agendamentos por data

@@ -1,7 +1,6 @@
 # LiteSpeed - Versão Simplificada
 Options -Indexes
 
-# Headers básicos
 <IfModule mod_headers.c>
     Header set Access-Control-Allow-Origin "https://rafaelmaciel.net"
     Header set Access-Control-Allow-Credentials "true"
@@ -9,8 +8,11 @@ Options -Indexes
     Header set Access-Control-Allow-Headers "Content-Type, Authorization"
 </IfModule>
 
-# Rewrite básico (se suportado)
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteRule ^$ index.php [L]
+    RewriteBase /sistemas/barberflow/backend/
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L,QSA]
 </IfModule>
