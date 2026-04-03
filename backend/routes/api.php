@@ -28,6 +28,7 @@ $request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
 
 $request = str_replace('/backend', '', $request);
+$request = str_replace('/sistemas/barberflow', '', $request);
 $request = str_replace('/index.php', '', $request);
 $request = rtrim($request, '/');
 
