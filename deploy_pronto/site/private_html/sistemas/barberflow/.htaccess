@@ -1,0 +1,17 @@
+Options -Indexes
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /sistemas/barberflow/
+
+    RewriteRule ^index\.html$ - [L]
+    RewriteRule ^static/ - [L]
+    RewriteRule ^asset-manifest\.json$ - [L]
+    RewriteRule ^favicon\.ico$ - [L]
+    RewriteRule ^robots\.txt$ - [L]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . /sistemas/barberflow/index.html [L]
+</IfModule>

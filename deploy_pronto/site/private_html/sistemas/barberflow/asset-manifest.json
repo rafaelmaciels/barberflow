@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/sistemas/barberflow/static/css/main.c32417dc.css",
+    "main.js": "/sistemas/barberflow/static/js/main.b3b163f4.js",
+    "index.html": "/sistemas/barberflow/index.html",
+    "main.c32417dc.css.map": "/sistemas/barberflow/static/css/main.c32417dc.css.map",
+    "main.b3b163f4.js.map": "/sistemas/barberflow/static/js/main.b3b163f4.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c32417dc.css",
+    "static/js/main.b3b163f4.js"
+  ]
+}

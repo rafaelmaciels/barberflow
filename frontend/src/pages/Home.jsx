@@ -1,12 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../services/api";
-import { formatBrazilWeekdayAndDate, getBrazilISODate } from "../utils/dateTime";
-
-const SERVICE_OPTIONS = [
-  { value: "1", label: "Corte" },
-  { value: "2", label: "Barba" },
-  { value: "3", label: "Combo (Cabelo + Barba)" }
-];
+import { formatBrazilWeekdayAndDate, getBrazilISODate, isBrazilSunday } from "../utils/dateTime";
 
 function formatMinutesToTime(totalMinutes) {
   const hours = String(Math.floor(totalMinutes / 60)).padStart(2, "0");
@@ -27,7 +21,7 @@ function generateTimeSlots(startHour, startMinute, endHour, endMinute, stepMinut
 }
 
 function getOptionLabelByValue(options, value) {
-  const option = options.find((item) => item.value === value);
+  const option = options.find((item) => String(item.value) === String(value));
   return option ? option.label : value;
 }
 
@@ -39,10 +33,13 @@ function buildAppointmentConfirmationMessage({ clientName, serviceName, selected
 }
 
 export default function Home() {
+  const sundayClosedMessage = "FECHADO!";
   const [name, setName] = useState("");
   const [service, setService] = useState("");
   const [time, setTime] = useState("");
   const [message, setMessage] = useState("");
+  const [services, setServices] = useState([]);
+  const [loadingServices, setLoadingServices] = useState(true);
   const [timeSlots, setTimeSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(true);
   const [currentDate, setCurrentDate] = useState(() => getBrazilISODate());
@@ -51,9 +48,35 @@ export default function Home() {
     return formatBrazilWeekdayAndDate(currentDate);
   }, [currentDate]);
 
-  useEffect(() => {
-    loadTimeSlots();
+  const isSunday = useMemo(() => {
+    return isBrazilSunday(currentDate);
   }, [currentDate]);
+
+  const serviceOptions = useMemo(() => {
+    return services.map((item) => ({
+      value: String(item.id),
+      label: item.name
+    }));
+  }, [services]);
+
+  const availableTimeSlots = useMemo(() => {
+    return timeSlots.filter((slot) => slot.available);
+  }, [timeSlots]);
+
+  useEffect(() => {
+    loadServices();
+  }, []);
+
+  useEffect(() => {
+    if (isSunday) {
+      setLoadingSlots(false);
+      setTimeSlots([]);
+      setTime("");
+      return;
+    }
+
+    loadTimeSlots();
+  }, [currentDate, isSunday]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -69,6 +92,26 @@ export default function Home() {
 
     return () => clearInterval(intervalId);
   }, []);
+
+  async function loadServices() {
+    setLoadingServices(true);
+
+    try {
+      const res = await api.getServices();
+      const data = await res.json();
+
+      if (Array.isArray(data)) {
+        setServices(data);
+      } else {
+        setServices([]);
+      }
+    } catch (error) {
+      console.log("Erro ao buscar serviços:", error);
+      setServices([]);
+    } finally {
+      setLoadingServices(false);
+    }
+  }
 
   async function loadTimeSlots() {
     setLoadingSlots(true);
@@ -94,13 +137,18 @@ export default function Home() {
   async function handleSubmit() {
     console.log("🔥 Clique funcionando");
 
+    if (isSunday) {
+      setMessage(sundayClosedMessage);
+      return;
+    }
+
     if (!name || !service || !time) {
       setMessage("Preencha todos os campos!");
       return;
     }
 
     const selectedDate = currentDate;
-    const selectedServiceLabel = getOptionLabelByValue(SERVICE_OPTIONS, service);
+    const selectedServiceLabel = getOptionLabelByValue(serviceOptions, service);
     const selectedSlot = timeSlots.find((slot) => String(slot.id) === time);
     const selectedTimeLabel = selectedSlot ? selectedSlot.time : time;
     const clientName = name;
@@ -189,9 +237,10 @@ export default function Home() {
                     value={service}
                     onChange={(e) => setService(e.target.value)}
                     className="form-select"
+                    disabled={loadingServices}
                   >
                     <option value="">Selecione o serviço</option>
-                    {SERVICE_OPTIONS.map((option) => (
+                    {serviceOptions.map((option) => (
                       <option key={option.value} value={option.value}>{option.label}</option>
                     ))}
                   </select>
@@ -203,25 +252,44 @@ export default function Home() {
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
                     className="form-select"
-                    disabled={loadingSlots}
+                    disabled={loadingSlots || isSunday}
                   >
                     <option value="">
-                      {loadingSlots ? "Carregando horários..." : "Selecione o horário"}
+                      {isSunday
+                        ? sundayClosedMessage
+                        : loadingSlots
+                          ? "Carregando horários..."
+                          : availableTimeSlots.length === 0
+                            ? "Nenhum horário disponível"
+                          : "Selecione o horário"}
                     </option>
-                    {timeSlots.map((slot) => (
+                    {availableTimeSlots.map((slot) => (
                       <option
                         key={slot.id}
                         value={String(slot.id)}
-                        disabled={!slot.available}
                       >
-                        {slot.time}{slot.available ? "" : " (Indisponível)"}
+                        {slot.time}
                       </option>
                     ))}
                   </select>
+                  {!isSunday && !loadingSlots && availableTimeSlots.length > 0 && (
+                    <p className="mt-2 mb-0 small text-secondary">
+                      Disponíveis: {availableTimeSlots.map((slot) => slot.time).join(", ")}
+                    </p>
+                  )}
+                  {isSunday && (
+                    <p className="mt-2 mb-0 small fw-semibold text-danger">
+                      {sundayClosedMessage}
+                    </p>
+                  )}
                 </div>
 
-                <button className="btn btn-primary w-100" onClick={handleSubmit}>
-                  Agendar
+                <button
+                  className="btn btn-primary w-100"
+                  onClick={handleSubmit}
+                  disabled={isSunday}
+                >
+                  {isSunday ? sundayClosedMessage : "Agendar"}
                 </button>
 
                 {/* Feedback */}

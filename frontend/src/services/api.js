@@ -39,6 +39,9 @@ const api = {
     }),
 
   // 📋 APPOINTMENTS
+  getServices: () =>
+    fetch(`${BASE_URL}/services`),
+
   getTimeSlots: (date) =>
     fetch(`${BASE_URL}/time-slots?date=${date}`),
 

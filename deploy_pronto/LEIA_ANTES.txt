@@ -1,0 +1,31 @@
+DEPLOY BARBERFLOW
+
+1. FTP
+Envie o conteudo de:
+deploy_pronto/site/private_html/
+
+Para:
+private_html/
+
+Isso vai criar esta estrutura no servidor:
+private_html/sistemas/barberflow/
+
+2. BANCO
+Nao envie os arquivos SQL para a pasta publica do site.
+
+Use estes arquivos apenas no phpMyAdmin ou via SSH/MySQL:
+- deploy_pronto/banco/barberflow.sql
+- deploy_pronto/banco/migracao_time_slots.sql
+
+3. QUAL SQL RODAR
+- Instalação nova: rode barberflow.sql
+- Banco ja existente: rode migracao_time_slots.sql
+
+4. CONEXAO
+O arquivo de conexao ja esta incluido em:
+deploy_pronto/site/private_html/sistemas/barberflow/backend/config/database.php
+
+5. TESTE
+- /sistemas/barberflow/
+- /sistemas/barberflow/backend/index.php/services
+- /sistemas/barberflow/backend/index.php/time-slots?date=2026-04-03

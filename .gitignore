@@ -17,6 +17,9 @@ dist/
 vendor/
 .env
 
+# Database credentials
+backend/config/database.php
+
 # =========================
 # SISTEMA
 # =========================

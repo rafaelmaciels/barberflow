@@ -2,6 +2,21 @@
 
 BarberFlow é um sistema web simples e funcional para gerenciamento de agendamentos em barbearias. O projeto foi desenvolvido com foco em usabilidade, desempenho e aplicação prática, permitindo que clientes agendem horários sem necessidade de cadastro.
 
+## 🌐 Produção
+
+Sistema publicado em:
+
+`https://rafaelmaciel.net/sistemas/barberflow/`
+
+### 🔐 Acesso administrativo padrão
+
+Após a importação padrão do banco:
+- Usuário: `admin`
+- Senha: `admin123`
+
+Observação:
+- Essas são as credenciais padrão definidas no script [barberflow.sql](/home/rafael/barberflow/barberflow.sql). Se o usuário foi alterado diretamente no banco de produção, o acesso pode estar diferente.
+
 ## 🚀 Objetivo
 
 Criar uma aplicação realista para portfólio que resolva um problema comum: organização de atendimentos em barbearias, substituindo agendas manuais ou atendimentos via WhatsApp.
@@ -20,6 +35,7 @@ Criar uma aplicação realista para portfólio que resolva um problema comum: or
 - Favicon com emoji `💈`
 - Escolha de horários disponíveis em intervalos de 30 minutos
 - Horários de atendimento: 08h00 às 12h00 e 13h30 às 18h00
+- Aos domingos o agendamento fica indisponível com a mensagem fixa `FECHADO!`
 - Título dinâmico de horários no formato:
   - `Horário - Quarta-feira 01/04/2026`
 - Confirmação de agendamento
@@ -32,6 +48,250 @@ Criar uma aplicação realista para portfólio que resolva um problema comum: or
 - Bloqueio de horários específicos
 
 ---
+
+## 🏗️ Tecnologias utilizadas
+
+### Frontend
+- React.js 18 com Hooks
+- Bootstrap 5 para interface responsiva
+- Axios para requisições HTTP
+
+### Backend
+- PHP 7.3+ com MySQLi
+- API REST com CORS
+- Sessões para autenticação
+
+### Banco de Dados
+- MySQL 8.0
+- Estrutura relacional com foreign keys
+
+### Infraestrutura
+- Docker & Docker Compose para desenvolvimento
+- LiteSpeed para produção
+
+---
+
+## 🚀 Instalação e Desenvolvimento
+
+### Pré-requisitos
+- Docker e Docker Compose
+- Node.js 16+ (opcional, para desenvolvimento frontend)
+- Git
+
+### Desenvolvimento Local
+
+1. **Clone o repositório:**
+   ```bash
+   git clone <url-do-repositorio>
+   cd barberflow
+   ```
+
+2. **Configure o ambiente:**
+   ```bash
+   # Copie o arquivo de exemplo das configurações do banco
+   cp backend/config/database.php.example backend/config/database.php
+   # Edite com suas credenciais locais
+   ```
+
+3. **Inicie os serviços:**
+   ```bash
+   # Inicia banco MySQL, backend PHP e frontend React
+   docker-compose up -d
+   ```
+
+4. **Para desenvolvimento frontend (opcional):**
+   ```bash
+   cd frontend
+   npm install
+   npm start
+   ```
+
+5. **Acesse:**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:8000
+
+### Produção
+
+1. **Configure o banco MySQL** no servidor
+2. **Execute o script SQL:**
+   ```sql
+   -- Importe barberflow.sql no phpMyAdmin
+   ```
+3. **Suba os arquivos via FTP:**
+   - Use FileZilla para enviar `deploy_pronto/site/` para `public_html/sistemas/barberflow/`
+4. **Configure credenciais** no `backend/config/database.php`
+
+---
+
+## 📁 Estrutura do Projeto
+
+```
+barberflow/
+├── backend/                 # API PHP
+│   ├── config/
+│   │   ├── database.php     # ⚠️ IGNORADO - configurar manualmente
+│   │   └── database.php.example
+│   ├── controllers/         # Controladores da API
+│   ├── models/             # Modelos (futuro)
+│   └── routes/
+│       └── api.php         # Definição das rotas
+├── frontend/               # Aplicação React
+│   ├── public/
+│   ├── src/
+│   │   ├── components/     # Componentes reutilizáveis
+│   │   ├── pages/         # Páginas da aplicação
+│   │   ├── services/      # Configuração da API
+│   │   └── styles/        # Estilos CSS
+│   └── package.json
+├── docker/                 # Configurações Docker
+├── deploy_pronto/          # 📦 Arquivos prontos para produção
+├── docker-compose.yml      # Orquestração local
+├── barberflow.sql          # Schema do banco
+├── .gitignore             # Arquivos ignorados
+└── README.md
+```
+
+---
+
+## 🗄️ Modelagem do Banco de Dados
+
+### users
+- id (PK)
+- username
+- password (hashed)
+
+### services
+- id (PK)
+- name
+- price
+- duration
+
+### time_slots
+- id (PK)
+- time
+
+### appointments
+- id (PK)
+- client_name
+- service_id (FK)
+- time_slot_id (FK)
+- appointment_date
+- status (agendado/cancelado/concluido)
+- created_at
+
+### settings
+- id (PK)
+- barbershop_open (boolean)
+
+---
+
+## 🔄 Fluxo da Aplicação
+
+1. Cliente acessa o sistema
+2. Informa nome
+3. Escolhe serviço
+4. Seleciona horário disponível
+5. Confirma o agendamento
+
+---
+
+## 🔌 API Endpoints
+
+### Cliente
+- `GET /services` - Lista serviços disponíveis
+- `GET /time-slots?date=YYYY-MM-DD` - Horários disponíveis para data
+- `POST /appointments` - Criar novo agendamento
+
+### Admin
+- `POST /login` - Autenticação administrador
+- `GET /auth` - Verificar sessão ativa
+- `POST /logout` - Encerrar sessão
+- `GET /appointments?date=YYYY-MM-DD` - Listar agendamentos
+- `PUT /appointments` - Cancelar agendamento
+- `GET /settings` - Obter configurações
+- `PUT /settings` - Atualizar configurações
+- `GET /dashboard?date=YYYY-MM-DD` - Dados do dashboard
+
+---
+
+## ⚙️ Regras de Negócio
+
+- Não permitir dois agendamentos no mesmo horário
+- Bloquear automaticamente no `select` os horários já agendados para a data
+- Gerar horários dinamicamente em intervalos de 30 minutos nos períodos:
+  - 08h00 às 12h00
+  - 13h30 às 18h00
+- Executar rotina diária às 00h01 para reset de agendamentos antigos e liberação dos intervalos do novo dia
+- Bloquear agendamentos com a barbearia fechada
+- Bloquear agendamentos aos domingos com a mensagem `FECHADO!`
+- Impedir seleção de horários já ocupados
+- Validar dados do cliente
+- Bloquear horários passados no dia atual
+
+---
+
+## 🔒 Segurança
+
+- ✅ Senhas hasheadas com `password_hash()` (PHP)
+- ✅ Sessões seguras para controle de acesso
+- ✅ Validação de entrada de dados
+- ✅ CORS configurado para domínios específicos
+- ✅ Arquivo `database.php` ignorado no Git (.gitignore)
+- ✅ Credenciais separadas do código
+
+---
+
+## 📦 Deploy para Produção
+
+### Passos para Deploy
+
+1. **Prepare o banco:**
+   - Crie banco MySQL no servidor
+   - Importe `barberflow.sql`
+   - Atualize senha do admin se necessário
+
+2. **Configure credenciais:**
+   ```php
+   // backend/config/database.php
+   $host = 'localhost'; // ou IP do servidor MySQL
+   $db = 'nome_do_banco';
+   $user = 'usuario_mysql';
+   $pass = 'senha_mysql';
+   ```
+
+3. **Suba os arquivos:**
+   - Use FileZilla ou similar
+   - Envie `deploy_pronto/site/` para `public_html/sistemas/barberflow/`
+
+4. **Teste:**
+   - Acesse https://seudominio.com/sistemas/barberflow/
+   - Teste login admin e agendamento
+
+### Arquivos Sensíveis
+⚠️ **Nunca commite:**
+- `backend/config/database.php` (contém senhas)
+- Arquivos `.env`
+- Credenciais de produção
+
+---
+
+## 🤝 Contribuição
+
+1. Fork o projeto
+2. Crie uma branch (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -am 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
+---
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT.
+
+---
+
+**Desenvolvido com ❤️ para barbearias modernas**
 
 ## 🏗️ Tecnologias utilizadas
 
@@ -72,19 +332,18 @@ Criar uma aplicação realista para portfólio que resolva um problema comum: or
 - id
 - name
 - price
-- active
+- duration
 
 ### time_slots
 - id
 - time
-- available
 
 ### appointments
 - id
 - client_name
 - service_id
 - time_slot_id
-- date
+- appointment_date
 - status
 - created_at
 
@@ -128,6 +387,7 @@ Criar uma aplicação realista para portfólio que resolva um problema comum: or
   - 13h30 às 18h00
 - Executar rotina diária às 00h01 para reset de agendamentos antigos e liberação dos intervalos do novo dia
 - Bloquear agendamentos com a barbearia fechada
+- Bloquear agendamentos aos domingos com a mensagem `FECHADO!`
 - Impedir seleção de horários já ocupados
 - Validar dados do cliente
 - Bloquear horários passados no dia atual
@@ -142,7 +402,7 @@ A aplicação será desenvolvida com foco em dispositivos móveis, garantindo um
 
 ## 📌 Status do Projeto
 
-🚧 Em desenvolvimento
+✅ Rodando em produção em `https://rafaelmaciel.net/sistemas/barberflow/`
 
 ---
 

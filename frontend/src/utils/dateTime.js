@@ -37,4 +37,11 @@ export function formatBrazilWeekdayAndDate(isoDate) {
   return `${weekday.charAt(0).toUpperCase()}${weekday.slice(1)} ${formattedDate}`;
 }
 
+export function isBrazilSunday(isoDate) {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  const utcDate = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+
+  return utcDate.getUTCDay() === 0;
+}
+
 export { BRAZIL_TIME_ZONE };
