@@ -7,7 +7,7 @@ function ServiceSelector({ onSelect, value }) {
     useEffect(() => {
         const fetchServicos = async () => {
             try {
-                const response = await fetch(`${api.baseURL}/services`);
+                const response = await api.getServices();
                 const data = await response.json();
                 setServicos(data);
             } catch (error) {

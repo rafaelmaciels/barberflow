@@ -9,7 +9,7 @@ function TimeSlots({ date, onSelect }) {
 
     async function fetchSlots() {
       try {
-        const res = await fetch(`${api.baseURL}/time-slots?date=${date}`);
+        const res = await api.getTimeSlots(date);
         const data = await res.json();
         setSlots(data);
       } catch (error) {

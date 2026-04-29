@@ -2,47 +2,78 @@
 
 require_once __DIR__ . '/../config/database.php';
 
-// =========================
-// LOGIN
-// =========================
-function login() {
+function upgradeLegacyAdminPasswordIfNeeded($conn, $userId, $plainPassword, $storedPassword) {
+    $isLegacyMd5 = preg_match('/^[a-f0-9]{32}$/i', (string) $storedPassword) === 1;
 
+    if ($isLegacyMd5 && md5($plainPassword) === $storedPassword) {
+        $newHash = password_hash($plainPassword, PASSWORD_DEFAULT);
+        $stmtUpdate = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
+
+        if ($stmtUpdate) {
+            $stmtUpdate->bind_param("si", $newHash, $userId);
+            $stmtUpdate->execute();
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+function passwordMatchesAdmin($conn, $userId, $plainPassword, $storedPassword) {
+    if (password_verify($plainPassword, $storedPassword)) {
+        if (password_needs_rehash($storedPassword, PASSWORD_DEFAULT)) {
+            $newHash = password_hash($plainPassword, PASSWORD_DEFAULT);
+            $stmtUpdate = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
+
+            if ($stmtUpdate) {
+                $stmtUpdate->bind_param("si", $newHash, $userId);
+                $stmtUpdate->execute();
+            }
+        }
+
+        return true;
+    }
+
+    return upgradeLegacyAdminPasswordIfNeeded($conn, $userId, $plainPassword, $storedPassword);
+}
+
+function login() {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
 
     $conn = getConnection();
-
     $data = json_decode(file_get_contents("php://input"), true);
 
-    $username = $data['username'] ?? '';
-    $password = md5($data['password'] ?? '');
+    $username = trim((string) ($data['username'] ?? ''));
+    $password = (string) ($data['password'] ?? '');
 
     $stmt = $conn->prepare("
-        SELECT id FROM users 
-        WHERE username = ? AND password = ?
+        SELECT id, password FROM users
+        WHERE username = ?
     ");
 
-    $stmt->bind_param("ss", $username, $password);
+    $stmt->bind_param("s", $username);
     $stmt->execute();
 
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        $_SESSION['admin'] = true;
+        $row = $result->fetch_assoc();
 
-        echo json_encode(["success" => true]);
-    } else {
-        http_response_code(401);
-        echo json_encode(["error" => "Credenciais inválidas"]);
+        if (passwordMatchesAdmin($conn, (int) $row['id'], $password, (string) $row['password'])) {
+            $_SESSION['admin'] = true;
+            echo json_encode(["success" => true]);
+            return;
+        }
     }
+
+    http_response_code(401);
+    echo json_encode(["error" => "Credenciais inválidas"]);
 }
 
-// =========================
-// CHECK AUTH
-// =========================
 function checkAuth() {
-
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
@@ -56,11 +87,7 @@ function checkAuth() {
     echo json_encode(["authenticated" => true]);
 }
 
-// =========================
-// LOGOUT
-// =========================
 function logout() {
-
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }

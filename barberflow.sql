@@ -75,10 +75,18 @@ INSERT INTO time_slots (time) VALUES
 ('18:00:00')
 ON DUPLICATE KEY UPDATE time = VALUES(time);
 
+-- Tabela de datas bloqueadas para feriados ou pausas
+CREATE TABLE IF NOT EXISTS blocked_dates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    blocked_date DATE NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Tabela de agendamentos
 CREATE TABLE IF NOT EXISTS appointments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     client_name VARCHAR(100) NOT NULL,
+    client_phone VARCHAR(20) NULL,
     service_id INT NOT NULL,
     time_slot_id INT NOT NULL,
     appointment_date DATE NOT NULL,

@@ -21,9 +21,13 @@ export function getBrazilISODate(date = new Date()) {
   return `${year}-${month}-${day}`;
 }
 
-export function formatBrazilWeekdayAndDate(isoDate) {
+function buildUTCDateFromISO(isoDate) {
   const [year, month, day] = isoDate.split("-").map(Number);
-  const utcDate = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+  return new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+}
+
+export function formatBrazilWeekdayAndDate(isoDate) {
+  const utcDate = buildUTCDateFromISO(isoDate);
 
   const weekday = new Intl.DateTimeFormat("pt-BR", {
     timeZone: BRAZIL_TIME_ZONE,
@@ -38,10 +42,23 @@ export function formatBrazilWeekdayAndDate(isoDate) {
 }
 
 export function isBrazilSunday(isoDate) {
-  const [year, month, day] = isoDate.split("-").map(Number);
-  const utcDate = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+  const utcDate = buildUTCDateFromISO(isoDate);
 
   return utcDate.getUTCDay() === 0;
+}
+
+export function addDaysToISODate(isoDate, daysToAdd) {
+  const utcDate = buildUTCDateFromISO(isoDate);
+  utcDate.setUTCDate(utcDate.getUTCDate() + daysToAdd);
+  return getBrazilISODate(utcDate);
+}
+
+export function formatBrazilDate(isoDate) {
+  const utcDate = buildUTCDateFromISO(isoDate);
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: BRAZIL_TIME_ZONE
+  }).format(utcDate);
 }
 
 export { BRAZIL_TIME_ZONE };

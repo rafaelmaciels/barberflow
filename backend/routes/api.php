@@ -19,21 +19,50 @@ function getAllowedOrigin() {
 }
 
 function normalizeRequestPath() {
+    $pathInfo = parse_url($_SERVER['PATH_INFO'] ?? '', PHP_URL_PATH) ?: '';
+    if ($pathInfo !== '' && $pathInfo !== '/') {
+        $pathInfo = '/' . ltrim($pathInfo, '/');
+        return rtrim($pathInfo, '/');
+    }
+
     $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
     $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
     $scriptDir = rtrim(str_replace('\\', '/', dirname($scriptName)), '/');
+    $appBasePath = rtrim(str_replace('\\', '/', dirname($scriptDir)), '/');
 
-    if ($scriptDir !== '' && $scriptDir !== '/' && strpos($requestPath, $scriptDir) === 0) {
-        $requestPath = substr($requestPath, strlen($scriptDir));
+    $prefixes = array_filter([
+        rtrim(str_replace('\\', '/', $scriptName), '/'),
+        $scriptDir,
+        $appBasePath,
+        '/backend',
+        '/index.php'
+    ]);
+
+    $normalized = '/' . ltrim((string) $requestPath, '/');
+    $changed = true;
+
+    while ($changed) {
+        $changed = false;
+
+        foreach ($prefixes as $prefix) {
+            if ($prefix === '' || $prefix === '/') {
+                continue;
+            }
+
+            if ($normalized === $prefix) {
+                $normalized = '/';
+                $changed = true;
+                continue;
+            }
+
+            if (strpos($normalized, $prefix . '/') === 0) {
+                $normalized = substr($normalized, strlen($prefix));
+                $changed = true;
+            }
+        }
     }
 
-    $scriptBaseName = basename($scriptName);
-    if ($scriptBaseName !== '' && strpos($requestPath, '/' . $scriptBaseName) === 0) {
-        $requestPath = substr($requestPath, strlen('/' . $scriptBaseName));
-    }
-
-    $requestPath = '/' . ltrim((string) $requestPath, '/');
-    $requestPath = rtrim($requestPath, '/');
+    $requestPath = rtrim('/' . ltrim((string) $normalized, '/'), '/');
 
     return $requestPath === '' ? '/services' : $requestPath;
 }
@@ -44,7 +73,7 @@ function normalizeRequestPath() {
 header("Access-Control-Allow-Origin: " . getAllowedOrigin());
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
 // =========================
@@ -68,6 +97,7 @@ require_once __DIR__ . '/../controllers/AppointmentController.php';
 require_once __DIR__ . '/../controllers/ServiceController.php';
 require_once __DIR__ . '/../controllers/TimeSlotController.php';
 require_once __DIR__ . '/../controllers/AdminController.php';
+require_once __DIR__ . '/../controllers/ScheduleDateController.php';
 
 // =========================
 // ROTAS
@@ -79,8 +109,48 @@ switch (true) {
         getServices();
         break;
 
+    case $request === '/services' && $method === 'POST':
+        createService();
+        break;
+
+    case $request === '/services' && $method === 'PUT':
+        updateService();
+        break;
+
+    case $request === '/services' && $method === 'DELETE':
+        deleteService();
+        break;
+
     case $request === '/time-slots' && $method === 'GET':
         getTimeSlots();
+        break;
+
+    case $request === '/time-slots/admin' && $method === 'GET':
+        getAdminTimeSlots();
+        break;
+
+    case $request === '/time-slots' && $method === 'POST':
+        createTimeSlot();
+        break;
+
+    case $request === '/time-slots' && $method === 'PUT':
+        updateTimeSlot();
+        break;
+
+    case $request === '/time-slots' && $method === 'DELETE':
+        deleteTimeSlot();
+        break;
+
+    case $request === '/blocked-dates' && $method === 'GET':
+        getBlockedDates();
+        break;
+
+    case $request === '/blocked-dates' && $method === 'POST':
+        blockScheduleDate();
+        break;
+
+    case $request === '/blocked-dates' && $method === 'DELETE':
+        unblockScheduleDate();
         break;
 
     case $request === '/appointments' && $method === 'POST':

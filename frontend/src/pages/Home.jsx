@@ -1,24 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../services/api";
-import { formatBrazilWeekdayAndDate, getBrazilISODate, isBrazilSunday } from "../utils/dateTime";
-
-function formatMinutesToTime(totalMinutes) {
-  const hours = String(Math.floor(totalMinutes / 60)).padStart(2, "0");
-  const minutes = String(totalMinutes % 60).padStart(2, "0");
-  return `${hours}h${minutes}`;
-}
-
-function generateTimeSlots(startHour, startMinute, endHour, endMinute, stepMinutes = 30) {
-  const start = (startHour * 60) + startMinute;
-  const end = (endHour * 60) + endMinute;
-  const slots = [];
-
-  for (let current = start; current <= end; current += stepMinutes) {
-    slots.push(formatMinutesToTime(current));
-  }
-
-  return slots;
-}
+import {
+  addDaysToISODate,
+  formatBrazilWeekdayAndDate,
+  getBrazilISODate,
+  isBrazilSunday
+} from "../utils/dateTime";
 
 function getOptionLabelByValue(options, value) {
   const option = options.find((item) => String(item.value) === String(value));
@@ -26,31 +13,49 @@ function getOptionLabelByValue(options, value) {
 }
 
 function buildAppointmentConfirmationMessage({ clientName, serviceName, selectedTime, selectedDate }) {
-  const morningSlots = generateTimeSlots(8, 0, 12, 0).join(", ");
-  const afternoonSlots = generateTimeSlots(13, 30, 18, 0).join(", ");
-
-  return `Olá, ${clientName}!\n\nSeu agendamento foi confirmado com sucesso para ${selectedDate} às ${selectedTime}, serviço: ${serviceName}.\n\nInformamos que novos horários estão disponíveis para atendimento em intervalos de 30 minutos:\n\nManhã (08h00 às 12h00):\n${morningSlots}.\n\nTarde (13h30 às 18h00):\n${afternoonSlots}.\n\nSe precisar de ajustes, estamos à disposição.`;
+  return `Olá, ${clientName}!\n\nSeu agendamento foi confirmado para ${selectedDate} às ${selectedTime}, serviço: ${serviceName}.\n\nSe precisar de ajustes, estamos à disposição.`;
 }
 
 export default function Home() {
-  const sundayClosedMessage = "FECHADO!";
+  const [todayDate, setTodayDate] = useState(() => getBrazilISODate());
+  const [selectedDate, setSelectedDate] = useState(() => getBrazilISODate());
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [service, setService] = useState("");
   const [time, setTime] = useState("");
   const [message, setMessage] = useState("");
   const [services, setServices] = useState([]);
+  const [blockedDates, setBlockedDates] = useState([]);
   const [loadingServices, setLoadingServices] = useState(true);
   const [timeSlots, setTimeSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(true);
-  const [currentDate, setCurrentDate] = useState(() => getBrazilISODate());
+  const [loadingBlockedDates, setLoadingBlockedDates] = useState(true);
+
+  const maxDate = useMemo(() => {
+    return addDaysToISODate(todayDate, 60);
+  }, [todayDate]);
 
   const currentDateLabel = useMemo(() => {
-    return formatBrazilWeekdayAndDate(currentDate);
-  }, [currentDate]);
+    return formatBrazilWeekdayAndDate(selectedDate);
+  }, [selectedDate]);
+
+  const blockedDateSet = useMemo(() => {
+    return new Set(blockedDates.map((item) => item.date));
+  }, [blockedDates]);
 
   const isSunday = useMemo(() => {
-    return isBrazilSunday(currentDate);
-  }, [currentDate]);
+    return isBrazilSunday(selectedDate);
+  }, [selectedDate]);
+
+  const isBlockedDate = useMemo(() => {
+    return blockedDateSet.has(selectedDate);
+  }, [blockedDateSet, selectedDate]);
+
+  const isPastDate = useMemo(() => {
+    return selectedDate < todayDate;
+  }, [selectedDate, todayDate]);
+
+  const isUnavailableDate = isPastDate || isSunday || isBlockedDate;
 
   const serviceOptions = useMemo(() => {
     return services.map((item) => ({
@@ -68,22 +73,33 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (isSunday) {
+    loadBlockedDates(todayDate, maxDate);
+  }, [todayDate, maxDate]);
+
+  useEffect(() => {
+    if (selectedDate < todayDate) {
+      setSelectedDate(todayDate);
+    }
+  }, [selectedDate, todayDate]);
+
+  useEffect(() => {
+    setTime("");
+    setMessage("");
+
+    if (isUnavailableDate) {
       setLoadingSlots(false);
       setTimeSlots([]);
-      setTime("");
       return;
     }
 
     loadTimeSlots();
-  }, [currentDate, isSunday]);
+  }, [selectedDate, isUnavailableDate]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       const nowDate = getBrazilISODate();
-      setCurrentDate((previousDate) => {
+      setTodayDate((previousDate) => {
         if (previousDate !== nowDate) {
-          setTime("");
           return nowDate;
         }
         return previousDate;
@@ -99,12 +115,7 @@ export default function Home() {
     try {
       const res = await api.getServices();
       const data = await res.json();
-
-      if (Array.isArray(data)) {
-        setServices(data);
-      } else {
-        setServices([]);
-      }
+      setServices(Array.isArray(data) ? data : []);
     } catch (error) {
       console.log("Erro ao buscar serviços:", error);
       setServices([]);
@@ -113,18 +124,28 @@ export default function Home() {
     }
   }
 
+  async function loadBlockedDates(from, to) {
+    setLoadingBlockedDates(true);
+
+    try {
+      const res = await api.getBlockedDates({ from, to });
+      const data = await res.json();
+      setBlockedDates(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.log("Erro ao buscar datas bloqueadas:", error);
+      setBlockedDates([]);
+    } finally {
+      setLoadingBlockedDates(false);
+    }
+  }
+
   async function loadTimeSlots() {
     setLoadingSlots(true);
 
     try {
-      const res = await api.getTimeSlots(currentDate);
+      const res = await api.getTimeSlots(selectedDate);
       const data = await res.json();
-
-      if (Array.isArray(data)) {
-        setTimeSlots(data);
-      } else {
-        setTimeSlots([]);
-      }
+      setTimeSlots(Array.isArray(data) ? data : []);
     } catch (error) {
       console.log("Erro ao buscar horários:", error);
       setTimeSlots([]);
@@ -133,21 +154,33 @@ export default function Home() {
     }
   }
 
-  // 🔥 FUNÇÃO PRINCIPAL
-  async function handleSubmit() {
-    console.log("🔥 Clique funcionando");
+  function getDateUnavailableMessage() {
+    if (isPastDate) {
+      return "Datas passadas não estão disponíveis.";
+    }
 
     if (isSunday) {
-      setMessage(sundayClosedMessage);
+      return "Domingos não recebem agendamentos.";
+    }
+
+    if (isBlockedDate) {
+      return "Esta data está indisponível para agendamento.";
+    }
+
+    return "";
+  }
+
+  async function handleSubmit() {
+    if (isUnavailableDate) {
+      setMessage(getDateUnavailableMessage());
       return;
     }
 
-    if (!name || !service || !time) {
-      setMessage("Preencha todos os campos!");
+    if (!name || !phone || !service || !time) {
+      setMessage("Preencha nome, WhatsApp, serviço e horário.");
       return;
     }
 
-    const selectedDate = currentDate;
     const selectedServiceLabel = getOptionLabelByValue(serviceOptions, service);
     const selectedSlot = timeSlots.find((slot) => String(slot.id) === time);
     const selectedTimeLabel = selectedSlot ? selectedSlot.time : time;
@@ -162,14 +195,13 @@ export default function Home() {
     try {
       const response = await api.createAppointment({
         nome_cliente: clientName,
+        telefone_cliente: phone,
         id_servico: service,
         id_horario: time,
         data_agendamento: selectedDate
       });
 
       const data = await response.json();
-
-      console.log("📥 Backend:", data);
 
       if (data.success) {
         setMessage(
@@ -185,16 +217,13 @@ export default function Home() {
         setMessage(data.error || "⚠️ Funcionando localmente (erro no backend)");
         loadTimeSlots();
       }
-
     } catch (error) {
       console.log("Erro:", error);
-
-      // 🔥 fallback seguro
       setMessage("⚠️ Funcionando localmente (sem backend)");
     }
 
-    // limpa campos
     setName("");
+    setPhone("");
     setService("");
     setTime("");
   }
@@ -206,12 +235,12 @@ export default function Home() {
           <div className="col-lg-6">
             <h1 className="display-5 fw-bold mb-3">💈 BarberFlow</h1>
             <p className="lead text-secondary mb-4">
-              Agende seu horário com rapidez e organize seu atendimento em poucos cliques.
+              Agende seu horário com rapidez e escolha datas futuras disponíveis em poucos cliques.
             </p>
             <div className="d-flex flex-wrap gap-2">
               <span className="badge text-bg-dark">Atendimento Rápido</span>
-              <span className="badge text-bg-primary">Fluxo Simples</span>
-              <span className="badge text-bg-secondary">Barbearia Moderna</span>
+              <span className="badge text-bg-primary">Agenda por Data</span>
+              <span className="badge text-bg-secondary">Confirmação Fácil</span>
             </div>
           </div>
 
@@ -226,16 +255,48 @@ export default function Home() {
                     type="text"
                     placeholder="Seu nome"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(event) => setName(event.target.value)}
                     className="form-control"
                   />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">WhatsApp</label>
+                  <input
+                    type="tel"
+                    placeholder="Ex.: 85999998888"
+                    value={phone}
+                    onChange={(event) => setPhone(event.target.value)}
+                    className="form-control"
+                    autoComplete="tel"
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Data</label>
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    min={todayDate}
+                    max={maxDate}
+                    onChange={(event) => setSelectedDate(event.target.value)}
+                    className="form-control"
+                  />
+                  <p className="mt-2 mb-0 small text-secondary">
+                    {loadingBlockedDates ? "Carregando calendário..." : currentDateLabel}
+                  </p>
+                  {isUnavailableDate && (
+                    <p className="mt-2 mb-0 small fw-semibold text-danger">
+                      {getDateUnavailableMessage()}
+                    </p>
+                  )}
                 </div>
 
                 <div className="mb-3">
                   <label className="form-label">Serviço</label>
                   <select
                     value={service}
-                    onChange={(e) => setService(e.target.value)}
+                    onChange={(event) => setService(event.target.value)}
                     className="form-select"
                     disabled={loadingServices}
                   >
@@ -247,21 +308,21 @@ export default function Home() {
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label">Horário - {currentDateLabel}</label>
+                  <label className="form-label">Horário</label>
                   <select
                     value={time}
-                    onChange={(e) => setTime(e.target.value)}
+                    onChange={(event) => setTime(event.target.value)}
                     className="form-select"
-                    disabled={loadingSlots || isSunday}
+                    disabled={loadingSlots || isUnavailableDate}
                   >
                     <option value="">
-                      {isSunday
-                        ? sundayClosedMessage
+                      {isUnavailableDate
+                        ? "Data indisponível"
                         : loadingSlots
                           ? "Carregando horários..."
                           : availableTimeSlots.length === 0
                             ? "Nenhum horário disponível"
-                          : "Selecione o horário"}
+                            : "Selecione o horário"}
                     </option>
                     {availableTimeSlots.map((slot) => (
                       <option
@@ -272,14 +333,9 @@ export default function Home() {
                       </option>
                     ))}
                   </select>
-                  {!isSunday && !loadingSlots && availableTimeSlots.length > 0 && (
+                  {!isUnavailableDate && !loadingSlots && availableTimeSlots.length > 0 && (
                     <p className="mt-2 mb-0 small text-secondary">
                       Disponíveis: {availableTimeSlots.map((slot) => slot.time).join(", ")}
-                    </p>
-                  )}
-                  {isSunday && (
-                    <p className="mt-2 mb-0 small fw-semibold text-danger">
-                      {sundayClosedMessage}
                     </p>
                   )}
                 </div>
@@ -287,12 +343,11 @@ export default function Home() {
                 <button
                   className="btn btn-primary w-100"
                   onClick={handleSubmit}
-                  disabled={isSunday}
+                  disabled={isUnavailableDate}
                 >
-                  {isSunday ? sundayClosedMessage : "Agendar"}
+                  {isUnavailableDate ? "Data indisponível" : "Agendar"}
                 </button>
 
-                {/* Feedback */}
                 {message && (
                   <p className="mt-3 mb-0 small fw-semibold text-secondary confirmation-message">
                     {message}
