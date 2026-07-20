@@ -594,10 +594,6 @@ A reprodução total ou parcial sem autorização é proibida.
 
 # 👨‍💻 Desenvolvedor
 
-## Rafael Maciel
-
-**BarberFlow**
-
 Sistema desenvolvido por Rafael Maciel.
 
 ---
@@ -610,9 +606,3 @@ Nosso objetivo é entregar uma solução moderna, rápida, segura e preparada pa
 
 ---
 
-<p align="center">
-
-<strong>BarberFlow</strong><br>
-Desenvolvido por Rafael Maciel
-
-</p>
