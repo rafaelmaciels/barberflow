@@ -141,9 +141,10 @@
         </div>
     </div>
 
-    <!-- Status Profissionais -->
+    <!-- Sidebar Dashboard -->
     <div class="col-lg-4">
-        <div class="card shadow-sm border-0 rounded-4 h-100 bg-primary text-white" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+        <!-- Status Profissionais -->
+        <div class="card shadow-sm border-0 rounded-4 mb-4 bg-primary text-white" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
             <div class="card-body p-4 d-flex flex-column justify-content-center text-center">
                 <div class="mb-4">
                     <i class="fa-solid fa-users fa-4x opacity-75"></i>
@@ -156,6 +157,30 @@
                     <a href="{{ route('barbers.index') }}" class="btn btn-light text-primary rounded-pill fw-bold px-4 shadow-sm">
                         Gerenciar Equipe
                     </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TV Recepção -->
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                <h5 class="fw-bold mb-0"><i class="fa-brands fa-youtube text-danger me-2"></i> TV da Recepção</h5>
+            </div>
+            <div class="card-body p-4">
+                <form action="{{ route('dashboard.youtube') }}" method="POST">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-semibold">Link do Vídeo (YouTube)</label>
+                        <div class="input-group">
+                            <input type="url" name="youtube_link" class="form-control form-control-sm" placeholder="https://youtube.com/watch?v=..." value="{{ $youtubeLink }}">
+                            <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
+                        </div>
+                        <div class="form-text small">Cole o link para exibir na tela de chamadas.</div>
+                    </div>
+                </form>
+                
+                <div class="d-grid mt-3">
+                    <a href="{{ route('queue.index') }}" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill"><i class="fa-solid fa-tv me-1"></i> Abrir Tela da TV</a>
                 </div>
             </div>
         </div>

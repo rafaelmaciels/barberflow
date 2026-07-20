@@ -44,6 +44,40 @@
         @keyframes blinker {
             50% { opacity: 0; }
         }
+        /* Video Container */
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            background-color: #000;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        /* Ajuste do scroll oculto na direita */
+        .right-column {
+            height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .atendimento-section {
+            flex-shrink: 0;
+            margin-bottom: 1.5rem;
+        }
+        .proximos-section {
+            flex: 1;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
@@ -63,23 +97,44 @@
     <div class="container-fluid mt-4 px-5">
         <div class="row">
             
-            <!-- Coluna: Em Atendimento (Prioridade) -->
-            <div class="col-md-7 pe-5">
-                <h2 class="text-success fw-bold mb-4"><i class="fa-solid fa-circle-play blinking me-2"></i> Chamados / Em Atendimento</h2>
-                <div id="lista-atendimento">
-                    <div class="text-center text-muted mt-5 pt-5">
-                        <div class="spinner-border text-primary" role="status"></div>
-                        <p class="mt-2">Carregando dados ao vivo...</p>
+            <!-- Coluna Esquerda: Vídeo -->
+            <div class="col-md-7 pe-4">
+                @if(isset($settings['youtube_queue_video']) && !empty($settings['youtube_queue_video']))
+                    <div class="video-container">
+                        <iframe src="{{ $settings['youtube_queue_video'] }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                     </div>
-                </div>
+                @else
+                    <div class="video-container d-flex flex-column justify-content-center align-items-center">
+                        <i class="fa-solid fa-film fa-5x text-secondary mb-3"></i>
+                        <h3 class="text-secondary">Vídeo não configurado</h3>
+                    </div>
+                @endif
             </div>
 
-            <!-- Coluna: Próximos da Fila -->
-            <div class="col-md-5 border-start border-secondary ps-5" style="min-height: 80vh;">
-                <h3 class="text-warning fw-bold mb-4"><i class="fa-solid fa-list-ol me-2"></i> Próximos da Fila</h3>
-                <div id="lista-proximos">
-                    <!-- Preenchido via AJAX -->
+            <!-- Coluna Direita: Listas -->
+            <div class="col-md-5 border-start border-secondary ps-4 right-column">
+                
+                <!-- Em Atendimento (Topo) -->
+                <div class="atendimento-section">
+                    <h3 class="text-success fw-bold mb-3"><i class="fa-solid fa-circle-play blinking me-2"></i> Em Atendimento</h3>
+                    <div id="lista-atendimento">
+                        <div class="text-center text-muted mt-3">
+                            <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
+                            <p class="mt-2 small">Carregando...</p>
+                        </div>
+                    </div>
                 </div>
+
+                <hr class="border-secondary opacity-25">
+
+                <!-- Próximos da Fila (Abaixo) -->
+                <div class="proximos-section">
+                    <h4 class="text-warning fw-bold mb-3"><i class="fa-solid fa-list-ol me-2"></i> Próximos</h4>
+                    <div id="lista-proximos">
+                        <!-- Preenchido via AJAX -->
+                    </div>
+                </div>
+
             </div>
 
         </div>
@@ -141,22 +196,22 @@
             function renderizarProximos(dados) {
                 var html = '';
                 if(dados.length === 0) {
-                    html = '<div class="text-muted mt-4"><i class="fa-solid fa-mug-hot me-2"></i>A fila está vazia.</div>';
+                    html = '<div class="text-muted mt-3 small"><i class="fa-solid fa-mug-hot me-2"></i>A fila está vazia.</div>';
                 } else {
-                    // Mostrar apenas os 5 próximos na tela
-                    var limite = dados.slice(0, 5);
+                    // Mostrar apenas os 3 próximos na tela devido ao espaço
+                    var limite = dados.slice(0, 3);
                     limite.forEach(function(item) {
                         var horaFormatada = item.hora.substring(0, 5);
                         html += `
-                        <div class="card-proximo p-3 mb-3">
+                        <div class="card-proximo p-2 px-3 mb-2">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h4 class="fw-bold mb-0">${item.cliente_nome}</h4>
-                                    <div class="text-secondary mb-1"><i class="fa-solid fa-cut small me-1"></i> ${item.service.nome}</div>
-                                    <div class="text-muted small">Profissional: ${item.barber.nome}</div>
+                                    <h5 class="fw-bold mb-0">${item.cliente_nome}</h5>
+                                    <div class="text-secondary small mb-0"><i class="fa-solid fa-cut me-1"></i> ${item.service.nome}</div>
+                                    <div class="text-muted" style="font-size: 0.8rem;">Profissional: ${item.barber.nome}</div>
                                 </div>
                                 <div class="text-end">
-                                    <div class="fs-4 fw-bold text-warning">${horaFormatada}</div>
+                                    <div class="fs-5 fw-bold text-warning">${horaFormatada}</div>
                                 </div>
                             </div>
                         </div>`;

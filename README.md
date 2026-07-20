@@ -88,15 +88,16 @@ Indicadores em tempo real:
 
 ---
 
-## ⏳ Fila de Atendimento
+## ⏳ Fila de Atendimento (Painel de TV)
 
 Atualização automática em tempo real.
 
 Exibe:
 
-- Nome
-- Horário
-- Serviço
+- Vídeo do YouTube em exibição simultânea (configurável pelo Dashboard)
+- Clientes em atendimento atual
+- Próximos 3 clientes da fila
+- Nome, Horário e Serviço
 
 Pode ser utilizada em televisores da recepção.
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\AppointmentService;
 use App\Services\FinancialService;
 use App\Services\BarberService;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -57,6 +58,9 @@ class DashboardController extends Controller
         // 4. Últimos 5 agendamentos gerais para exibir na tabela
         $recentAppointments = $allAppointments->sortByDesc('created_at')->take(5);
 
+        // 5. Configuração do YouTube
+        $youtubeLink = Setting::where('key', 'youtube_queue_video_raw')->value('value');
+
         return view('dashboard.index', compact(
             'totalAgendamentosHoje',
             'agendamentosConcluidos',
@@ -64,7 +68,43 @@ class DashboardController extends Controller
             'despesaMensal',
             'lucroMensal',
             'totalBarbeirosAtivos',
-            'recentAppointments'
+            'recentAppointments',
+            'youtubeLink'
         ));
+    }
+
+    public function saveYoutubeLink(Request $request)
+    {
+        $request->validate([
+            'youtube_link' => 'nullable|url'
+        ]);
+
+        $url = $request->youtube_link;
+        $embedUrl = null;
+
+        if ($url) {
+            // Regex to extract Video ID
+            preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/\s]{11})%i', $url, $match);
+            
+            if (isset($match[1])) {
+                $videoId = $match[1];
+                // Montar link para auto-play em loop e sem som na TV
+                $embedUrl = "https://www.youtube.com/embed/{$videoId}?autoplay=1&mute=1&loop=1&playlist={$videoId}&controls=0&showinfo=0";
+            }
+        }
+
+        // Salvar a original para mostrar no form
+        Setting::updateOrCreate(
+            ['key' => 'youtube_queue_video_raw'],
+            ['value' => $url]
+        );
+
+        // Salvar a formatada para o iframe
+        Setting::updateOrCreate(
+            ['key' => 'youtube_queue_video'],
+            ['value' => $embedUrl]
+        );
+
+        return redirect()->back()->with('success', 'Link do YouTube atualizado com sucesso!');
     }
 }

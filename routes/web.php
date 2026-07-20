@@ -33,7 +33,9 @@ Route::get('/fila/dados', [QueueController::class, 'data'])->name('queue.data');
 
 // Rotas Autenticadas
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // Dashboard (Módulo 3: Métricas)
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::post('/dashboard/youtube', [DashboardController::class, 'saveYoutubeLink'])->name('dashboard.youtube');
     
     // Módulo 1: Configurações
     Route::get('/settings', [\App\Http\Controllers\Settings\SettingsController::class, 'index'])->name('settings.index');
