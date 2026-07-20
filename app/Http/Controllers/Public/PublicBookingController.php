@@ -58,6 +58,19 @@ class PublicBookingController extends Controller
             return redirect()->back()->withErrors(['hora' => 'Este horário não está mais disponível. Por favor, escolha outro.'])->withInput();
         }
 
+        // Verificar bloqueios administrativos
+        $isBlocked = \App\Models\BlockedTime::where('date', $request->data)
+            ->where(function ($query) use ($request) {
+                $query->whereNull('barber_id')->orWhere('barber_id', $request->barber_id);
+            })
+            ->where('start_time', '<=', $request->hora)
+            ->where('end_time', '>', $request->hora)
+            ->exists();
+
+        if ($isBlocked) {
+            return redirect()->back()->withErrors(['hora' => 'Este horário encontra-se bloqueado pela administração.'])->withInput();
+        }
+
         $data = $request->all();
         // Garante que todo agendamento público comece com status 'agendado'
         $data['status'] = 'agendado';
@@ -127,7 +140,7 @@ class PublicBookingController extends Controller
             $allTimes[] = date('H:i', $time);
         }
 
-        // Buscar horários já ocupados
+        // Buscar horários já ocupados (agendamentos reais)
         $bookedTimes = \App\Models\Appointment::where('barber_id', $barberId)
             ->where('data', $date)
             ->whereIn('status', ['agendado', 'concluido'])
@@ -137,17 +150,38 @@ class PublicBookingController extends Controller
             })
             ->toArray();
 
+        // Buscar bloqueios configurados no painel
+        $blocks = \App\Models\BlockedTime::where('date', $date)
+            ->where(function ($query) use ($barberId) {
+                $query->whereNull('barber_id')->orWhere('barber_id', $barberId);
+            })->get();
+
         // Filtrar horários disponíveis
         $isToday = $date === date('Y-m-d');
         $currentTime = date('H:i');
 
-        $availableTimes = array_filter($allTimes, function ($time) use ($bookedTimes, $isToday, $currentTime) {
-            if (in_array($time, $bookedTimes)) {
-                return false; // Já ocupado
-            }
+        $availableTimes = array_filter($allTimes, function ($time) use ($bookedTimes, $isToday, $currentTime, $blocks) {
+            // Regra 1: Se já passou do horário de hoje
             if ($isToday && $time <= $currentTime) {
-                return false; // Horário já passou
+                return false;
             }
+            // Regra 2: Se já existe agendamento
+            if (in_array($time, $bookedTimes)) {
+                return false;
+            }
+            // Regra 3: Se cruza com algum bloqueio administrativo
+            foreach ($blocks as $block) {
+                // Compara o $time com o intervalo bloqueado. 
+                // Ex: Se o time é 12:00, e o block é 12:00 às 13:00, o 12:00 está bloqueado.
+                // Usamos substr para remover os segundos se houver
+                $blockStart = substr($block->start_time, 0, 5);
+                $blockEnd = substr($block->end_time, 0, 5);
+                
+                if ($time >= $blockStart && $time < $blockEnd) {
+                    return false; // Bloqueado
+                }
+            }
+            
             return true;
         });
 

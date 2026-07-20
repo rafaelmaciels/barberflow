@@ -11,6 +11,9 @@
         <a class="list-group-item list-group-item-action list-group-item-light p-3 {{ request()->routeIs('appointments.*') ? 'active' : '' }}" href="{{ route('appointments.index') }}">
             <i class="fas fa-calendar-alt fa-fw me-2"></i>Agenda
         </a>
+        <a class="list-group-item list-group-item-action list-group-item-light p-3 {{ request()->routeIs('blocked-times.*') ? 'active' : '' }}" href="{{ route('blocked-times.index') }}">
+            <i class="fas fa-calendar-times fa-fw me-2 text-danger"></i>Bloqueios
+        </a>
         <a class="list-group-item list-group-item-action list-group-item-light p-3 {{ request()->routeIs('barbers.*') ? 'active' : '' }}" href="{{ route('barbers.index') }}">
             <i class="fas fa-cut fa-fw me-2"></i>Barbeiros
         </a>

@@ -112,7 +112,13 @@ Pode ser utilizada em televisores da recepção.
 - Despesas
 - Fechamento diário
 - Fechamento mensal
+## 🔐 Bloqueio de Agenda e Férias
 
+A gerência tem total controle sobre os horários da barbearia:
+- Bloqueios parciais (ex: horário de almoço)
+- Bloqueios totais (ex: feriados e dias de folga)
+- Bloqueio por equipe inteira ou individual para cada barbeiro
+- Ocultação automática dos horários na página pública de agendamento
 ---
 
 ## 📈 Relatórios

@@ -1,0 +1,155 @@
+@extends('layouts.app')
+
+@section('title', 'Bloqueio de Agenda')
+
+@section('content')
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2 class="fw-bold text-primary mb-0"><i class="fa-solid fa-calendar-times text-danger me-2"></i> Bloqueios de Agenda</h2>
+        <button class="btn btn-primary fw-bold px-4 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNovoBloqueio">
+            <i class="fa-solid fa-plus me-1"></i> Novo Bloqueio
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4">
+                
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                @if($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                @if($blockedTimes->isEmpty())
+                    <div class="text-center text-muted py-5">
+                        <i class="fa-regular fa-calendar-check fa-4x mb-3 opacity-50 text-success"></i>
+                        <h4>Nenhum bloqueio programado</h4>
+                        <p>A agenda está totalmente livre para todos os barbeiros.</p>
+                    </div>
+                @else
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Horário</th>
+                                    <th>Profissional</th>
+                                    <th>Motivo</th>
+                                    <th class="text-end">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($blockedTimes as $block)
+                                <tr>
+                                    <td class="fw-semibold">{{ \Carbon\Carbon::parse($block->date)->format('d/m/Y') }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            {{ \Carbon\Carbon::parse($block->start_time)->format('H:i') }} às {{ \Carbon\Carbon::parse($block->end_time)->format('H:i') }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if($block->barber_id)
+                                            <span class="text-primary fw-bold"><i class="fa-solid fa-user me-1"></i> {{ $block->barber->nome }}</span>
+                                        @else
+                                            <span class="text-danger fw-bold"><i class="fa-solid fa-store me-1"></i> Barbearia Toda</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-muted">{{ $block->reason ?? '-' }}</td>
+                                    <td class="text-end">
+                                        <form action="{{ route('blocked-times.destroy', $block->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Tem certeza que deseja remover este bloqueio? A agenda voltará a ficar disponível para os clientes.')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Remover Bloqueio">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Novo Bloqueio -->
+<div class="modal fade" id="modalNovoBloqueio" tabindex="-1" aria-labelledby="modalNovoBloqueioLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold text-primary" id="modalNovoBloqueioLabel"><i class="fa-solid fa-ban me-2"></i> Adicionar Bloqueio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('blocked-times.store') }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Profissional (Opcional)</label>
+                        <select name="barber_id" class="form-select">
+                            <option value="">[ Barbearia Toda (Fechada) ]</option>
+                            @foreach($barbers as $barber)
+                                <option value="{{ $barber->id }}">{{ $barber->nome }}</option>
+                            @endforeach
+                        </select>
+                        <div class="form-text small">Selecione um profissional para folga individual, ou deixe vazio para bloquear geral.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Data</label>
+                        <input type="date" name="date" class="form-control" required min="{{ date('Y-m-d') }}">
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">Hora de Início</label>
+                            <input type="time" name="start_time" class="form-control" value="00:00" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">Hora de Término</label>
+                            <input type="time" name="end_time" class="form-control" value="23:59" required>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-text small">Para bloquear o dia todo, deixe de 00:00 às 23:59.</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Motivo (Visível só p/ Admin)</label>
+                        <input type="text" name="reason" class="form-control" placeholder="Ex: Feriado, Folga, Almoço...">
+                    </div>
+
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Bloquear Agenda</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endsection

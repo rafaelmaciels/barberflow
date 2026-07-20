@@ -51,6 +51,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('appointments/api', [\App\Http\Controllers\Appointments\AppointmentController::class, 'apiEvents'])->name('appointments.api');
     Route::resource('appointments', \App\Http\Controllers\Appointments\AppointmentController::class);
 
+    // Módulo 2: Profissionais (Barbeiros)
+    Route::get('/barbers', [\App\Http\Controllers\Dashboard\BarberController::class, 'index'])->name('barbers.index');
+    Route::post('/barbers', [\App\Http\Controllers\Dashboard\BarberController::class, 'store'])->name('barbers.store');
+    Route::put('/barbers/{id}/toggle', [\App\Http\Controllers\Dashboard\BarberController::class, 'toggleStatus'])->name('barbers.toggle');
+    Route::put('/barbers/{id}', [\App\Http\Controllers\Dashboard\BarberController::class, 'update'])->name('barbers.update');
+
+    // Módulo de Bloqueios de Agenda
+    Route::get('/blocked-times', [\App\Http\Controllers\Dashboard\BlockedTimeController::class, 'index'])->name('blocked-times.index');
+    Route::post('/blocked-times', [\App\Http\Controllers\Dashboard\BlockedTimeController::class, 'store'])->name('blocked-times.store');
+    Route::delete('/blocked-times/{id}', [\App\Http\Controllers\Dashboard\BlockedTimeController::class, 'destroy'])->name('blocked-times.destroy');
+
     // Módulo 7: Financeiro
     Route::resource('finance', \App\Http\Controllers\Finance\FinancialController::class)->except(['edit', 'update', 'show']);
 
