@@ -14,6 +14,6 @@
         O sistema BarberFlow está totalmente configurado e pronto para uso. Você já foi autenticado como administrador.
     </p>
     
-    <a href="{{ route('dashboard.index') }}" class="btn btn-success w-100 mt-3">Acessar Meu Painel (Dashboard)</a>
+    <a href="{{ route('dashboard') }}" class="btn btn-success w-100 mt-3">Acessar Meu Painel (Dashboard)</a>
 </div>
 @endsection

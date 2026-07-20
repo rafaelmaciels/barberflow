@@ -88,8 +88,8 @@ class DashboardController extends Controller
             
             if (isset($match[1])) {
                 $videoId = $match[1];
-                // Montar link para auto-play em loop e sem som na TV
-                $embedUrl = "https://www.youtube.com/embed/{$videoId}?autoplay=1&mute=1&loop=1&playlist={$videoId}&controls=0&showinfo=0";
+                // Montar link para auto-play em loop, mas com controles visíveis para un-mute e navegação
+                $embedUrl = "https://www.youtube.com/embed/{$videoId}?autoplay=1&mute=1&loop=1&playlist={$videoId}&controls=1";
             }
         }
 
