@@ -34,7 +34,17 @@ class PublicBookingController extends Controller
         
         $settings = Setting::all()->pluck('value', 'key');
         
-        return view('welcome', compact('barbers', 'services', 'settings'));
+        // Fila Ao Vivo: Atendimentos de hoje (agendado ou em_atendimento)
+        $today = date('Y-m-d');
+        $currentTime = date('H:i');
+        
+        $proximosAtendimentos = \App\Models\Appointment::where('data', $today)
+            ->whereIn('status', ['agendado', 'em_atendimento'])
+            ->where('hora', '>=', $currentTime)
+            ->orderBy('hora', 'asc')
+            ->get();
+        
+        return view('welcome', compact('barbers', 'services', 'settings', 'proximosAtendimentos'));
     }
 
     public function store(Request $request)
@@ -186,5 +196,27 @@ class PublicBookingController extends Controller
         });
 
         return response()->json(array_values($availableTimes));
+    }
+
+    public function getLiveQueue()
+    {
+        $today = date('Y-m-d');
+        $currentTime = date('H:i');
+        
+        $proximosAtendimentos = \App\Models\Appointment::with('barber')
+            ->where('data', $today)
+            ->whereIn('status', ['agendado', 'em_atendimento'])
+            ->where('hora', '>=', $currentTime)
+            ->orderBy('hora', 'asc')
+            ->get()
+            ->map(function ($apt) {
+                return [
+                    'cliente_nome' => explode(' ', $apt->cliente_nome)[0],
+                    'barber_nome' => $apt->barber->nome,
+                    'hora' => \Carbon\Carbon::parse($apt->hora)->format('H:i')
+                ];
+            });
+
+        return response()->json($proximosAtendimentos);
     }
 }

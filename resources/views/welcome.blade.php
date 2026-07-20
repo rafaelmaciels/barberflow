@@ -48,8 +48,10 @@
 
     <main class="container mb-5">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card booking-card bg-white p-4 p-md-5">
+            
+            <!-- Coluna de Agendamento -->
+            <div class="col-lg-7 mb-4 mb-lg-0">
+                <div class="card booking-card bg-white p-4 p-md-5 h-100">
                     
                     @if(session('success'))
                         <div class="alert alert-success alert-dismissible fade show rounded-4 p-4 text-center" role="alert">
@@ -149,6 +151,47 @@
 
                 </div>
             </div>
+
+            <!-- Coluna Fila Ao Vivo -->
+            <div class="col-lg-5">
+                <div class="card booking-card bg-white p-4 h-100" style="border-top: 5px solid #198754;">
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                        <h4 class="fw-bold text-dark mb-0"><i class="fa-solid fa-list-ol text-success me-2"></i> Fila Ao Vivo</h4>
+                        <span class="badge bg-success rounded-pill px-3">{{ $proximosAtendimentos->count() }} aguardando</span>
+                    </div>
+
+                    @if($proximosAtendimentos->isEmpty())
+                        <div class="text-center text-muted py-5">
+                            <i class="fa-solid fa-mug-hot fa-3x mb-3 opacity-25"></i>
+                            <h5>Ninguém na fila ainda</h5>
+                            <p class="small">Seja o primeiro a agendar para hoje!</p>
+                        </div>
+                    @else
+                        <div class="queue-list" style="max-height: 500px; overflow-y: auto; padding-right: 10px;">
+                            @foreach($proximosAtendimentos as $index => $apt)
+                                <div class="card shadow-sm border-0 mb-3" style="background: #f8f9fa;">
+                                    <div class="card-body p-3 d-flex align-items-center">
+                                        <div class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 40px; height: 40px; font-weight: bold;">
+                                            {{ $index + 1 }}
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="fw-bold mb-0 text-dark">{{ explode(' ', $apt->cliente_nome)[0] }} <span class="fw-normal opacity-50">...</span></h6>
+                                            <div class="text-muted small"><i class="fa-solid fa-scissors fa-fw me-1"></i>{{ $apt->barber->nome }}</div>
+                                        </div>
+                                        <div class="text-end">
+                                            <h5 class="fw-bold text-primary mb-0">{{ \Carbon\Carbon::parse($apt->hora)->format('H:i') }}</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="text-center mt-4">
+                            <p class="text-muted small mb-0"><i class="fa-solid fa-circle-info me-1"></i> Apenas o primeiro nome é exibido por privacidade.</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -231,6 +274,58 @@
             if (barberSelect.value && dataInput.value) {
                 fetchAvailableTimes();
             }
+
+            // --- Lógica de Fila Ao Vivo (Polling) ---
+            function updateLiveQueue() {
+                fetch('/api/queue-live')
+                    .then(response => response.json())
+                    .then(data => {
+                        const queueContainer = document.querySelector('.queue-list');
+                        const badgeCount = document.querySelector('.badge.bg-success');
+                        
+                        if (!queueContainer) return; // Segurança
+
+                        badgeCount.textContent = data.length + ' aguardando';
+
+                        if (data.length === 0) {
+                            queueContainer.parentElement.innerHTML = `
+                                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                                    <h4 class="fw-bold text-dark mb-0"><i class="fa-solid fa-list-ol text-success me-2"></i> Fila Ao Vivo</h4>
+                                    <span class="badge bg-success rounded-pill px-3">0 aguardando</span>
+                                </div>
+                                <div class="text-center text-muted py-5">
+                                    <i class="fa-solid fa-mug-hot fa-3x mb-3 opacity-25"></i>
+                                    <h5>Ninguém na fila ainda</h5>
+                                    <p class="small">Seja o primeiro a agendar para hoje!</p>
+                                </div>
+                            `;
+                        } else {
+                            let html = '';
+                            data.forEach((apt, index) => {
+                                html += `
+                                <div class="card shadow-sm border-0 mb-3" style="background: #f8f9fa;">
+                                    <div class="card-body p-3 d-flex align-items-center">
+                                        <div class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 40px; height: 40px; font-weight: bold;">
+                                            ${index + 1}
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="fw-bold mb-0 text-dark">${apt.cliente_nome} <span class="fw-normal opacity-50">...</span></h6>
+                                            <div class="text-muted small"><i class="fa-solid fa-scissors fa-fw me-1"></i>${apt.barber_nome}</div>
+                                        </div>
+                                        <div class="text-end">
+                                            <h5 class="fw-bold text-primary mb-0">${apt.hora}</h5>
+                                        </div>
+                                    </div>
+                                </div>`;
+                            });
+                            queueContainer.innerHTML = html;
+                        }
+                    })
+                    .catch(error => console.error('Erro ao atualizar fila ao vivo:', error));
+            }
+
+            // Atualizar fila a cada 10 segundos
+            setInterval(updateLiveQueue, 10000);
         });
     </script>
 </body>

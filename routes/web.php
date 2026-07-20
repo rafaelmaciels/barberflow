@@ -26,6 +26,7 @@ Route::prefix('install')->name('installation.')->group(function () {
 Route::get('/', [PublicBookingController::class, 'index'])->name('public.booking');
 Route::post('/agendar', [PublicBookingController::class, 'store'])->name('public.booking.store');
 Route::get('/api/available-times', [PublicBookingController::class, 'getAvailableTimes'])->name('api.available-times');
+Route::get('/api/queue-live', [PublicBookingController::class, 'getLiveQueue'])->name('api.queue-live');
 
 // Rota Pública/TV (Módulo 6: Fila de Atendimento)
 Route::get('/fila', [QueueController::class, 'index'])->name('queue.index');
