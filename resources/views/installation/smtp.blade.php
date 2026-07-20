@@ -1,0 +1,39 @@
+@extends('installation.layout')
+
+@section('step_title', 'Passo 3: Configuração de E-mail (SMTP)')
+
+@section('content')
+<form action="{{ route('installation.setupSmtp') }}" method="POST">
+    @csrf
+    <div class="mb-3">
+        <label>Servidor SMTP (Host)</label>
+        <input type="text" name="mail_host" class="form-control" placeholder="ex: smtp.mailtrap.io" required>
+    </div>
+    <div class="mb-3">
+        <label>Porta SMTP</label>
+        <input type="number" name="mail_port" class="form-control" placeholder="ex: 587 ou 465" required>
+    </div>
+    <div class="mb-3">
+        <label>Usuário SMTP</label>
+        <input type="text" name="mail_username" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label>Senha SMTP</label>
+        <input type="password" name="mail_password" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label>Criptografia</label>
+        <select name="mail_encryption" class="form-select">
+            <option value="tls">TLS</option>
+            <option value="ssl">SSL</option>
+            <option value="">Nenhuma</option>
+        </select>
+    </div>
+    <div class="mb-4">
+        <label>E-mail de Remetente (From)</label>
+        <input type="email" name="mail_from_address" class="form-control" placeholder="ex: no-reply@barberflow.com" required>
+    </div>
+    
+    <button type="submit" class="btn btn-dark w-100">Salvar e Continuar</button>
+</form>
+@endsection

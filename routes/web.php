@@ -4,7 +4,23 @@ use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Public\PublicBookingController;
 use App\Http\Controllers\Public\QueueController;
 use App\Http\Controllers\Settings\SettingController;
+use App\Http\Controllers\Installation\InstallationController;
 use Illuminate\Support\Facades\Route;
+
+// Rotas de Instalação (Livres de autenticação e de bloqueio, exceto se já instalado)
+Route::prefix('install')->name('installation.')->group(function () {
+    Route::get('/', [InstallationController::class, 'index'])->name('index');
+    Route::get('/database', [InstallationController::class, 'database'])->name('database');
+    Route::post('/database', [InstallationController::class, 'setupDatabase'])->name('setupDatabase');
+    Route::get('/migrations', [InstallationController::class, 'migrations'])->name('migrations');
+    Route::get('/smtp', [InstallationController::class, 'smtp'])->name('smtp');
+    Route::post('/smtp', [InstallationController::class, 'setupSmtp'])->name('setupSmtp');
+    Route::get('/company', [InstallationController::class, 'company'])->name('company');
+    Route::post('/company', [InstallationController::class, 'setupCompany'])->name('setupCompany');
+    Route::get('/admin', [InstallationController::class, 'admin'])->name('admin');
+    Route::post('/admin', [InstallationController::class, 'setupAdmin'])->name('setupAdmin');
+    Route::get('/complete', [InstallationController::class, 'complete'])->name('complete');
+});
 
 // Rota Pública (Módulo 5: Agendamento Público)
 Route::get('/', [PublicBookingController::class, 'index'])->name('public.booking');

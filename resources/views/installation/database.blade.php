@@ -1,0 +1,31 @@
+@extends('installation.layout')
+
+@section('step_title', 'Passo 2: Configuração do Banco de Dados')
+
+@section('content')
+<form action="{{ route('installation.setupDatabase') }}" method="POST">
+    @csrf
+    <div class="mb-3">
+        <label>Host do MySQL</label>
+        <input type="text" name="db_host" class="form-control" value="127.0.0.1" required>
+    </div>
+    <div class="mb-3">
+        <label>Porta do MySQL</label>
+        <input type="number" name="db_port" class="form-control" value="3306" required>
+    </div>
+    <div class="mb-3">
+        <label>Nome do Banco de Dados</label>
+        <input type="text" name="db_database" class="form-control" value="barberflow" required>
+    </div>
+    <div class="mb-3">
+        <label>Usuário do Banco</label>
+        <input type="text" name="db_username" class="form-control" value="root" required>
+    </div>
+    <div class="mb-4">
+        <label>Senha do Banco</label>
+        <input type="password" name="db_password" class="form-control">
+        <small class="text-muted">Deixe em branco se não houver senha (como no XAMPP padrão).</small>
+    </div>
+    <button type="submit" class="btn btn-dark w-100">Testar Conexão e Continuar</button>
+</form>
+@endsection
