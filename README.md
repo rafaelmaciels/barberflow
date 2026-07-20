@@ -38,13 +38,15 @@ O sistema foi projetado para evoluir futuramente para uma plataforma SaaS (Softw
 
 # 🚀 Principais Funcionalidades
 
-## 📅 Agendamento Inteligente
+## 📅 Agendamento Público
 
-- Agendamento público
-- Sem necessidade de cadastro de clientes
-- Bloqueio automático de horários ocupados
-- Bloqueio de horários passados
-- Validação por operação matemática (anti-spam)
+Página pública e responsiva (`/`) onde o cliente pode:
+
+- Escolher o serviço
+- Escolher o barbeiro (ou livre)
+- Escolher Data e Hora baseado na disponibilidade em tempo real
+- Acompanhar a **Fila Ao Vivo** (quantas pessoas já agendadas na frente)
+- Verificação Anti-Bot embutida (anti-spam)
 - Seleção de barbeiro
 - Seleção de serviço
 - Confirmação automática
