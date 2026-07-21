@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Refatoração visual global focada em UI/UX Premium (Design mais limpo e profissional, utilizando o tema Azul).
+- Sistema nativo de Modo Escuro (Dark Mode) acionado por botões ☀️ / 🌙 e persistido via `localStorage`.
+- Limpeza global de classes Bootstrap hardcoded (migração para o sistema de variáveis e esquema de cores automático).
 - Módulo Instalador SaaS (Wizard web) contendo setup de banco de dados, SMTP, empresa e administrador inicial.
 - Módulo de Relatórios completo com filtros dinâmicos e exportação automática nativa para PDF e Excel (Agendamentos, Financeiro e Desempenho).
 - Painel "Fila Ao Vivo" na página pública de agendamento (gatilho de escassez/prova social).
@@ -16,3 +19,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Layout aprimorado da Tela da TV, priorizando espaço lateral para exibição de vídeo e lista compacta (máximo de 3) de clientes aguardando.
 - Arquitetura inicial baseada no padrão SaaS.
 - Configurações do Git e arquivos de documentação (README, CHANGELOG, etc).
+
+### Fixed
+- Correção de erro de sintaxe Javascript causado por comentários minificados em uma única linha (afetou o agendamento público, calendário de edição e TV).
