@@ -140,10 +140,10 @@ class PublicBookingController extends Controller
             return response()->json([]);
         }
 
-        // Configuração de horários (08:00 às 19:00, 30 min)
+        // Configuração de horários (08:00 às 19:00, 25 min)
         $startTime = strtotime('08:00');
         $endTime = strtotime('19:00');
-        $interval = 30 * 60; // 30 minutos em segundos
+        $interval = 25 * 60; // 25 minutos em segundos
 
         $allTimes = [];
         for ($time = $startTime; $time <= $endTime; $time += $interval) {
