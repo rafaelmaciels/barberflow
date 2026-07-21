@@ -152,11 +152,11 @@
                 </div>
             </div>
 
-            <!-- Coluna Fila Ao Vivo -->
-            <div class="col-lg-5">
-                <div class="card booking-card bg-white p-4 h-100" style="border-top: 5px solid #198754;">
-                    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
-                        <h4 class="fw-bold text-dark mb-0"><i class="fa-solid fa-list-ol text-success me-2"></i> Fila Ao Vivo</h4>
+            <!-- COLUNA DA DIREITA: FILA AO VIVO -->
+            <div class="col-lg-5 order-1 order-lg-2 mb-4 mb-lg-0 d-none d-md-block">
+                <div class="card shadow-sm border-0 rounded-4 sticky-top" style="top: 20px; z-index: 1;">
+                    <div class="card-header bg-dark text-white rounded-top-4 py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold"><i class="fa-solid fa-users fa-fw me-2 text-warning"></i> Próximos</h5>
                         <span class="badge bg-success rounded-pill px-3">{{ $proximosAtendimentos->count() }} aguardando</span>
                     </div>
 
@@ -289,8 +289,8 @@
 
                         if (data.length === 0) {
                             queueContainer.parentElement.innerHTML = `
-                                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
-                                    <h4 class="fw-bold text-dark mb-0"><i class="fa-solid fa-list-ol text-success me-2"></i> Fila Ao Vivo</h4>
+                                <div class="card-header bg-dark text-white rounded-top-4 py-3 d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-users fa-fw me-2 text-warning"></i> Próximos</h5>
                                     <span class="badge bg-success rounded-pill px-3">0 aguardando</span>
                                 </div>
                                 <div class="text-center text-muted py-5">
