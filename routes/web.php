@@ -52,11 +52,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('appointments/api', [\App\Http\Controllers\Appointments\AppointmentController::class, 'apiEvents'])->name('appointments.api');
     Route::resource('appointments', \App\Http\Controllers\Appointments\AppointmentController::class);
 
-    // Módulo 2: Profissionais (Barbeiros)
-    Route::get('/barbers', [\App\Http\Controllers\Dashboard\BarberController::class, 'index'])->name('barbers.index');
-    Route::post('/barbers', [\App\Http\Controllers\Dashboard\BarberController::class, 'store'])->name('barbers.store');
-    Route::put('/barbers/{id}/toggle', [\App\Http\Controllers\Dashboard\BarberController::class, 'toggleStatus'])->name('barbers.toggle');
-    Route::put('/barbers/{id}', [\App\Http\Controllers\Dashboard\BarberController::class, 'update'])->name('barbers.update');
 
     // Módulo de Bloqueios de Agenda
     Route::get('/blocked-times', [\App\Http\Controllers\Dashboard\BlockedTimeController::class, 'index'])->name('blocked-times.index');
@@ -70,10 +65,6 @@ Route::middleware(['auth'])->group(function () {
     // Módulo 7: Financeiro
     Route::resource('finance', \App\Http\Controllers\Finance\FinancialController::class)->except(['edit', 'update', 'show']);
 
-    // Módulo 8: Relatórios
-    Route::get('/reports', [\App\Http\Controllers\Reports\ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/pdf', [\App\Http\Controllers\Reports\ReportController::class, 'exportPdf'])->name('reports.pdf');
-    Route::get('/reports/excel', [\App\Http\Controllers\Reports\ReportController::class, 'exportExcel'])->name('reports.excel');
 });
 
 // Inclui as rotas de autenticação

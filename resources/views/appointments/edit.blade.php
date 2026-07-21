@@ -52,7 +52,21 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">WhatsApp</label>
-                            <input type="text" class="form-control bg-light" name="cliente_whatsapp" value="{{ old('cliente_whatsapp', $appointment->cliente_whatsapp) }}" required>
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light" name="cliente_whatsapp" value="{{ old('cliente_whatsapp', $appointment->cliente_whatsapp) }}" required>
+                                @php
+                                    $nomeBarbeiro = $appointment->barber->nome ?? 'nossa equipe';
+                                    $nomeServico = $appointment->service->nome ?? 'o serviço';
+                                    $msg = "Olá, {$appointment->cliente_nome}! Seu agendamento está confirmado para o dia " . \Carbon\Carbon::parse($appointment->data)->format('d/m/Y') . " às " . substr($appointment->hora, 0, 5) . " na BarberFlow. Barbeiro: {$nomeBarbeiro} | Serviço: {$nomeServico}.";
+                                    $num = preg_replace('/[^0-9]/', '', $appointment->cliente_whatsapp);
+                                    // Adiciona o DDI do Brasil caso não tenha
+                                    if(strlen($num) <= 11) $num = '55' . $num;
+                                    $waLink = "https://wa.me/{$num}?text=" . urlencode($msg);
+                                @endphp
+                                <a href="{{ $waLink }}" target="_blank" class="btn btn-success fw-bold">
+                                    <i class="fa-brands fa-whatsapp"></i> Confirmar
+                                </a>
+                            </div>
                         </div>
                     </div>
 
