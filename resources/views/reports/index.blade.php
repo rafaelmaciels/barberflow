@@ -1,166 +1,221 @@
 @extends('layouts.app')
 
-@section('title', 'Relatórios Gerenciais')
+@section('title', 'Relatórios Administrativos')
 
 @section('content')
 <div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2 class="fw-bold text-primary mb-0"><i class="fa-solid fa-chart-pie me-2"></i> Relatórios</h2>
+    </div>
+</div>
+
+<div class="row mb-4">
     <div class="col-12">
-        <h2 class="fw-bold text-primary mb-0"><i class="fa-solid fa-file-invoice me-2"></i> Inteligência e Relatórios</h2>
-        <p class="text-muted">Filtre as datas para gerar balanços precisos da sua barbearia.</p>
-    </div>
-</div>
-
-<!-- Filtro -->
-<div class="card shadow-sm border-0 rounded-4 mb-4">
-    <div class="card-body p-4 bg-light bg-opacity-50">
-        <form action="{{ route('reports.index') }}" method="GET" class="row align-items-end g-3">
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Data Inicial</label>
-                <input type="date" name="start_date" class="form-control" value="{{ $startDate }}" required>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Data Final</label>
-                <input type="date" name="end_date" class="form-control" value="{{ $endDate }}" required>
-            </div>
-            <div class="col-md-4">
-                <button type="submit" class="btn btn-primary w-100 fw-bold">
-                    <i class="fa-solid fa-filter me-2"></i> Filtrar Período
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Resumo do Período Filtrado -->
-<div class="row g-4 mb-4">
-    <div class="col-md-6 col-lg-3">
-        <div class="card border-0 shadow-sm rounded-4 h-100 border-start border-primary border-4">
-            <div class="card-body">
-                <div class="text-muted small fw-bold mb-1 uppercase">Total Agendamentos</div>
-                <h3 class="fw-bold mb-0">{{ $metrics['total_appointments'] }}</h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-lg-3">
-        <div class="card border-0 shadow-sm rounded-4 h-100 border-start border-success border-4">
-            <div class="card-body">
-                <div class="text-muted small fw-bold mb-1 uppercase">Concluídos (Sucesso)</div>
-                <h3 class="fw-bold mb-0 text-success">{{ $metrics['completed'] }}</h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-lg-3">
-        <div class="card border-0 shadow-sm rounded-4 h-100 border-start border-danger border-4">
-            <div class="card-body">
-                <div class="text-muted small fw-bold mb-1 uppercase">Cancelamentos</div>
-                <h3 class="fw-bold mb-0 text-danger">{{ $metrics['cancelled'] }}</h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-lg-3">
-        <div class="card border-0 shadow-sm rounded-4 h-100 border-start border-warning border-4">
-            <div class="card-body">
-                <div class="text-muted small fw-bold mb-1 uppercase">Não Compareceu (Faltas)</div>
-                <h3 class="fw-bold mb-0 text-warning">{{ $metrics['no_shows'] }}</h3>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Mais Métricas -->
-<div class="row g-4 mb-5">
-    <div class="col-lg-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-            <div class="card-header bg-white border-0 pt-4 px-4">
-                <h5 class="fw-bold text-success mb-0"><i class="fa-solid fa-dollar-sign me-2"></i> Balanço Financeiro do Período</h5>
-            </div>
-            <div class="card-body px-4 pb-4">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between px-0 py-3">
-                        <span class="text-muted">Receitas Brutas</span>
-                        <span class="fw-bold text-success">R$ {{ number_format($metrics['revenue'], 2, ',', '.') }}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between px-0 py-3">
-                        <span class="text-muted">Despesas Variáveis/Fixas</span>
-                        <span class="fw-bold text-danger">R$ {{ number_format($metrics['expenses'], 2, ',', '.') }}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between px-0 py-3 bg-light rounded mt-2">
-                        <span class="fw-bold text-dark">LUCRO LÍQUIDO</span>
-                        <span class="fw-bold fs-5 {{ $metrics['profit'] < 0 ? 'text-danger' : 'text-primary' }}">
-                            R$ {{ number_format($metrics['profit'], 2, ',', '.') }}
-                        </span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-            <div class="card-header bg-white border-0 pt-4 px-4">
-                <h5 class="fw-bold text-warning mb-0"><i class="fa-solid fa-trophy me-2"></i> Destaques do Período</h5>
-            </div>
-            <div class="card-body px-4 pb-4">
-                
-                <div class="mb-4">
-                    <div class="text-muted small mb-1">Profissional Mais Lucrativo</div>
-                    @if($metrics['top_barber'])
-                        <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded">
-                            <div class="fw-bold fs-5">{{ $metrics['top_barber']['name'] }}</div>
-                            <div class="text-success fw-bold">R$ {{ number_format($metrics['top_barber']['revenue'], 2, ',', '.') }}</div>
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4">
+                <form action="{{ route('reports.index') }}" method="GET" id="filterForm">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold text-secondary">Tipo de Relatório</label>
+                            <select name="type" id="report_type" class="form-select bg-light" onchange="document.getElementById('filterForm').submit()">
+                                <option value="appointments" {{ $type == 'appointments' ? 'selected' : '' }}>Agendamentos</option>
+                                <option value="finance" {{ $type == 'finance' ? 'selected' : '' }}>Financeiro</option>
+                                <option value="services" {{ $type == 'services' ? 'selected' : '' }}>Desempenho de Serviços</option>
+                                <option value="barbers" {{ $type == 'barbers' ? 'selected' : '' }}>Desempenho de Barbeiros</option>
+                            </select>
                         </div>
-                    @else
-                        <div class="text-muted italic">Nenhum dado no período.</div>
-                    @endif
-                </div>
-
-                <div>
-                    <div class="text-muted small mb-1">Serviço Mais Vendido</div>
-                    @if($metrics['top_service'])
-                        <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded">
-                            <div class="fw-bold fs-5">{{ $metrics['top_service']['name'] }}</div>
-                            <div class="badge bg-primary rounded-pill">{{ $metrics['top_service']['count'] }} execuções</div>
+                        
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold text-secondary">Data Inicial</label>
+                            <input type="date" name="start_date" class="form-control bg-light" value="{{ $startDate }}">
                         </div>
-                    @else
-                        <div class="text-muted italic">Nenhum dado no período.</div>
-                    @endif
-                </div>
 
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold text-secondary">Data Final</label>
+                            <input type="date" name="end_date" class="form-control bg-light" value="{{ $endDate }}">
+                        </div>
+
+                        @if($type == 'appointments')
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold text-secondary">Status</label>
+                                <select name="status" class="form-select bg-light">
+                                    <option value="">Todos</option>
+                                    <option value="agendado" {{ request('status') == 'agendado' ? 'selected' : '' }}>Agendado</option>
+                                    <option value="concluido" {{ request('status') == 'concluido' ? 'selected' : '' }}>Concluído</option>
+                                    <option value="cancelado" {{ request('status') == 'cancelado' ? 'selected' : '' }}>Cancelado</option>
+                                    <option value="nao_compareceu" {{ request('status') == 'nao_compareceu' ? 'selected' : '' }}>Não Compareceu</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mt-3">
+                                <label class="form-label fw-bold text-secondary">Barbeiro</label>
+                                <select name="barber_id" class="form-select bg-light">
+                                    <option value="">Todos</option>
+                                    @foreach($barbers as $barber)
+                                        <option value="{{ $barber->id }}" {{ request('barber_id') == $barber->id ? 'selected' : '' }}>{{ $barber->nome }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @elseif($type == 'finance')
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold text-secondary">Tipo (Receita/Despesa)</label>
+                                <select name="transaction_type" class="form-select bg-light">
+                                    <option value="">Todos</option>
+                                    <option value="receita" {{ request('transaction_type') == 'receita' ? 'selected' : '' }}>Receita</option>
+                                    <option value="despesa" {{ request('transaction_type') == 'despesa' ? 'selected' : '' }}>Despesa</option>
+                                </select>
+                            </div>
+                        @endif
+
+                        <div class="col-md-12 d-flex align-items-end mt-3 gap-2">
+                            <button type="submit" class="btn btn-primary px-4 fw-bold rounded-pill">
+                                <i class="fa-solid fa-search me-1"></i> Buscar
+                            </button>
+                            
+                            @if(count($data) > 0)
+                                <button type="submit" formaction="{{ route('reports.export') }}" name="format" value="pdf" class="btn btn-danger px-4 fw-bold rounded-pill" formtarget="_blank">
+                                    <i class="fa-solid fa-file-pdf me-1"></i> Baixar PDF
+                                </button>
+                                <button type="submit" formaction="{{ route('reports.export') }}" name="format" value="excel" class="btn btn-success px-4 fw-bold rounded-pill">
+                                    <i class="fa-solid fa-file-excel me-1"></i> Baixar Excel
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Exportações -->
 <div class="row">
     <div class="col-12">
-        <div class="card border-0 shadow-sm rounded-4 bg-primary text-white" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
-            <div class="card-body p-4 p-md-5 d-flex flex-column flex-md-row justify-content-between align-items-center">
-                <div class="mb-4 mb-md-0">
-                    <h3 class="fw-bold mb-2">Exportar Relatórios Oficiais</h3>
-                    <p class="mb-0 opacity-75">Baixe o balanço consolidado deste período ({{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} a {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }})</p>
-                </div>
-                <div class="d-flex gap-3 flex-column flex-sm-row">
-                    <!-- Botão Excel -->
-                    <form action="{{ route('reports.excel') }}" method="GET">
-                        <input type="hidden" name="start_date" value="{{ $startDate }}">
-                        <input type="hidden" name="end_date" value="{{ $endDate }}">
-                        <button type="submit" class="btn btn-light text-success fw-bold px-4 py-3 rounded-3 shadow-sm w-100">
-                            <i class="fa-solid fa-file-excel fs-4 mb-2 d-block"></i>
-                            Exportar Excel
-                        </button>
-                    </form>
-                    
-                    <!-- Botão PDF -->
-                    <form action="{{ route('reports.pdf') }}" method="GET">
-                        <input type="hidden" name="start_date" value="{{ $startDate }}">
-                        <input type="hidden" name="end_date" value="{{ $endDate }}">
-                        <button type="submit" class="btn btn-light text-danger fw-bold px-4 py-3 rounded-3 shadow-sm w-100">
-                            <i class="fa-solid fa-file-pdf fs-4 mb-2 d-block"></i>
-                            Exportar PDF
-                        </button>
-                    </form>
-                </div>
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4">
+                
+                <h5 class="fw-bold mb-4 border-bottom pb-2">Resultados ({{ count($data) }} registros)</h5>
+
+                @if(count($data) == 0)
+                    <div class="text-center text-muted py-5">
+                        <i class="fa-solid fa-inbox fa-3x mb-3 opacity-25"></i>
+                        <p>Nenhum dado encontrado para os filtros selecionados.</p>
+                    </div>
+                @else
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            @if($type == 'appointments')
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Data/Hora</th>
+                                        <th>Cliente</th>
+                                        <th>Barbeiro</th>
+                                        <th>Serviço</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($data as $row)
+                                        <tr>
+                                            <td>{{ \Carbon\Carbon::parse($row->data)->format('d/m/Y') }} às {{ \Carbon\Carbon::parse($row->hora)->format('H:i') }}</td>
+                                            <td class="fw-bold">{{ $row->cliente_nome }}</td>
+                                            <td>{{ $row->barber->nome ?? 'N/D' }}</td>
+                                            <td>{{ $row->service->nome ?? 'N/D' }} (R$ {{ number_format($row->service->valor ?? 0, 2, ',', '.') }})</td>
+                                            <td>
+                                                @if($row->status == 'agendado') <span class="badge bg-primary">Agendado</span>
+                                                @elseif($row->status == 'em_atendimento') <span class="badge bg-warning text-dark">Em Atendimento</span>
+                                                @elseif($row->status == 'concluido') <span class="badge bg-success">Concluído</span>
+                                                @elseif($row->status == 'cancelado') <span class="badge bg-danger">Cancelado</span>
+                                                @else <span class="badge bg-secondary">Não Compareceu</span> @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            @elseif($type == 'finance')
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Tipo</th>
+                                        <th>Categoria</th>
+                                        <th>Descrição</th>
+                                        <th class="text-end">Valor (R$)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $totalReceita = 0;
+                                        $totalDespesa = 0;
+                                    @endphp
+                                    @foreach($data as $row)
+                                        @php
+                                            if($row->tipo == 'receita') $totalReceita += $row->valor;
+                                            else $totalDespesa += $row->valor;
+                                        @endphp
+                                        <tr>
+                                            <td>{{ \Carbon\Carbon::parse($row->data)->format('d/m/Y') }}</td>
+                                            <td>
+                                                @if($row->tipo == 'receita')
+                                                    <span class="badge bg-success"><i class="fa-solid fa-arrow-up me-1"></i> Receita</span>
+                                                @else
+                                                    <span class="badge bg-danger"><i class="fa-solid fa-arrow-down me-1"></i> Despesa</span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $row->categoria }}</td>
+                                            <td>{{ $row->descricao }}</td>
+                                            <td class="text-end fw-bold {{ $row->tipo == 'receita' ? 'text-success' : 'text-danger' }}">
+                                                R$ {{ number_format($row->valor, 2, ',', '.') }}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="4" class="text-end fw-bold">Balanço do Período:</td>
+                                        <td class="text-end fw-bold fs-5 {{ ($totalReceita - $totalDespesa) >= 0 ? 'text-success' : 'text-danger' }}">
+                                            R$ {{ number_format($totalReceita - $totalDespesa, 2, ',', '.') }}
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            @elseif($type == 'services')
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Serviço</th>
+                                        <th class="text-center">Quantidade Vendida</th>
+                                        <th class="text-end">Faturamento Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($data as $index => $row)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td class="fw-bold text-primary">{{ $row['nome'] }}</td>
+                                            <td class="text-center">{{ $row['qtd'] }}x</td>
+                                            <td class="text-end fw-bold text-success">R$ {{ number_format($row['faturamento'], 2, ',', '.') }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            @elseif($type == 'barbers')
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Barbeiro</th>
+                                        <th class="text-center">Atendimentos Concluídos</th>
+                                        <th class="text-end">Faturamento Gerado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($data as $index => $row)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td class="fw-bold text-primary"><i class="fa-solid fa-user-tie me-2"></i>{{ $row['nome'] }}</td>
+                                            <td class="text-center">{{ $row['qtd'] }} atendimentos</td>
+                                            <td class="text-end fw-bold text-success">R$ {{ number_format($row['faturamento'], 2, ',', '.') }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            @endif
+                        </table>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

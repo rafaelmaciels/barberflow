@@ -18,13 +18,13 @@
             <i class="fas fa-cut fa-fw me-2"></i>Barbeiros
         </a>
         <a class="list-group-item list-group-item-action list-group-item-light p-3 {{ request()->routeIs('services.*') ? 'active' : '' }}" href="{{ route('services.index') }}">
-            <i class="fas fa-concierge-bell fa-fw me-2"></i>Serviços
+            <i class="fas fa-list fa-fw me-2"></i>Catálogo de Serviços
         </a>
         <a class="list-group-item list-group-item-action list-group-item-light p-3 {{ request()->routeIs('finance.*') ? 'active' : '' }}" href="{{ route('finance.index') }}">
-            <i class="fas fa-dollar-sign fa-fw me-2"></i>Financeiro
+            <i class="fas fa-wallet fa-fw me-2"></i>Financeiro
         </a>
         <a class="list-group-item list-group-item-action list-group-item-light p-3 {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}">
-            <i class="fas fa-file-invoice fa-fw me-2"></i>Relatórios
+            <i class="fas fa-chart-pie fa-fw me-2"></i>Relatórios
         </a>
         <a class="list-group-item list-group-item-action list-group-item-light p-3 {{ request()->routeIs('settings.*') ? 'active' : '' }}" href="{{ route('settings.index') }}">
             <i class="fas fa-cogs fa-fw me-2"></i>Configurações

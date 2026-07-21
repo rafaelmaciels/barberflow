@@ -125,12 +125,13 @@ A gerência tem total controle sobre os horários da barbearia:
 
 ## 📈 Relatórios
 
-- Financeiro
-- Serviços
-- Agendamentos
-- Barbeiros
-- Exportação PDF
-- Exportação Excel
+O módulo de relatórios é uma central de inteligência do negócio:
+
+- **Agendamentos:** Filtre por data, barbeiro e status (Concluído, Cancelado, Não Compareceu).
+- **Financeiro:** Acompanhe o fluxo de caixa, totalizando receitas e despesas.
+- **Desempenho de Serviços:** Ranking dos serviços mais populares e que mais geram faturamento.
+- **Desempenho de Barbeiros:** Ranking de quem mais atende e mais contribui financeiramente.
+- **Exportação Universal:** Exporte todos os relatórios nativamente em formato **PDF** ou **Excel (.xlsx)**.
 
 ---
 

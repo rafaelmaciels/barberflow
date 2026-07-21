@@ -63,6 +63,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/blocked-times', [\App\Http\Controllers\Dashboard\BlockedTimeController::class, 'store'])->name('blocked-times.store');
     Route::delete('/blocked-times/{id}', [\App\Http\Controllers\Dashboard\BlockedTimeController::class, 'destroy'])->name('blocked-times.destroy');
 
+    // Módulo de Relatórios (Plano C)
+    Route::get('/reports', [\App\Http\Controllers\Dashboard\ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export', [\App\Http\Controllers\Dashboard\ReportController::class, 'export'])->name('reports.export');
+
     // Módulo 7: Financeiro
     Route::resource('finance', \App\Http\Controllers\Finance\FinancialController::class)->except(['edit', 'update', 'show']);
 
