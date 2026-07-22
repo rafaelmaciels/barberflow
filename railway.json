@@ -4,6 +4,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "releaseCommand": "node fix-db.js && php artisan config:cache && php artisan migrate --force"
+    "releaseCommand": "php artisan config:cache && php artisan migrate --force"
   }
 }
