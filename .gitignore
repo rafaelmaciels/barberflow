@@ -19,3 +19,6 @@ yarn-error.log
 /.phpunit.cache
 /barberflow.sqlite
 /barberflow.sqlite-journal
+
+*.pem
+

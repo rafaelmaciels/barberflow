@@ -1,67 +1,53 @@
 #!/bin/bash
-# Log execution
-exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
-echo "Starting Barberflow installation..."
+# Log all output
+exec > /var/log/user-data.log 2>&1
+set -x
 
-# Update and install dependencies
-export DEBIAN_FRONTEND=noninteractive
-apt-get update
-apt-get install -y nginx git unzip sqlite3 libsqlite3-dev curl software-properties-common
+# 1. Update and install basic dependencies
+apt-get update -y
+apt-get upgrade -y
+apt-get install -y software-properties-common curl unzip git nginx mysql-server
 
-# Add PHP 8.4 repository
-add-apt-repository -y ppa:ondrej/php
-apt-get update
-apt-get install -y php8.4-fpm php8.4-cli php8.4-sqlite3 php8.4-mbstring php8.4-xml php8.4-curl php8.4-zip php8.4-bcmath php8.4-intl
+# 2. Add PHP 8.3 repository
+add-apt-repository ppa:ondrej/php -y
+apt-get update -y
 
-# Install Composer
+# 3. Install PHP 8.3 and extensions
+apt-get install -y php8.3-fpm php8.3-cli php8.3-mysql php8.3-mbstring php8.3-xml php8.3-curl php8.3-zip php8.3-bcmath php8.3-intl
+
+# 4. Install Composer
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Install Node.js 22
-curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+# 5. Install Node.js 20
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt-get install -y nodejs
 
-# Clone the repository
+# 6. Configure MySQL Database
+systemctl start mysql
+systemctl enable mysql
+
+mysql -e "CREATE DATABASE barberflow;"
+mysql -e "CREATE USER 'barberflow'@'localhost' IDENTIFIED BY 'BarberFlow123!';"
+mysql -e "GRANT ALL PRIVILEGES ON barberflow.* TO 'barberflow'@'localhost';"
+mysql -e "FLUSH PRIVILEGES;"
+
+# 7. Setup Directory
 mkdir -p /var/www/barberflow
-git clone https://github.com/rafaelmaciels/barberflow.git /var/www/barberflow
-cd /var/www/barberflow
+chown -R ubuntu:ubuntu /var/www/barberflow
+chmod -R 775 /var/www/barberflow
 
-# Configure Environment
-cp .env.example .env
-# Set APP_URL for Nginx (will use IP or domain later, but localhost is fine for now)
-sed -i 's/APP_URL=http:\/\/localhost/APP_URL=http:\/\/*/g' .env
-# Ensure SQLite is used
-sed -i 's/DB_CONNECTION=mysql/DB_CONNECTION=sqlite/g' .env
-
-# Install dependencies
-composer install --no-dev --optimize-autoloader
-npm install
-npm run build
-
-# Generate Key and Migrate Database
-php artisan key:generate
-touch database/database.sqlite
-php artisan migrate --force
-
-# Set permissions
-chown -R www-data:www-data /var/www/barberflow
-chmod -R 775 /var/www/barberflow/storage
-chmod -R 775 /var/www/barberflow/bootstrap/cache
-chmod 664 /var/www/barberflow/database/database.sqlite
-chown www-data:www-data /var/www/barberflow/database
-chown www-data:www-data /var/www/barberflow/database/database.sqlite
-
-# Configure Nginx
-cat << 'EOF' > /etc/nginx/sites-available/barberflow
+# 8. Configure Nginx
+cat > /etc/nginx/sites-available/barberflow << 'EOF'
 server {
     listen 80;
+    listen [::]:80;
     server_name _;
     root /var/www/barberflow/public;
 
     add_header X-Frame-Options "SAMEORIGIN";
-    add_header X-XSS-Protection "1; mode=block";
     add_header X-Content-Type-Options "nosniff";
 
-    index index.php index.html index.htm;
+    index index.php;
 
     charset utf-8;
 
@@ -75,8 +61,10 @@ server {
     error_page 404 /index.php;
 
     location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php8.4-fpm.sock;
+        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+        fastcgi_hide_header X-Powered-By;
     }
 
     location ~ /\.(?!well-known).* {
@@ -87,9 +75,11 @@ EOF
 
 ln -s /etc/nginx/sites-available/barberflow /etc/nginx/sites-enabled/
 rm /etc/nginx/sites-enabled/default
-
-# Restart services
-systemctl restart php8.4-fpm
 systemctl restart nginx
 
-echo "Installation complete!"
+# 9. Configure PHP settings (optional, increase upload limits if needed)
+sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 50M/' /etc/php/8.3/fpm/php.ini
+sed -i 's/post_max_size = 8M/post_max_size = 50M/' /etc/php/8.3/fpm/php.ini
+systemctl restart php8.3-fpm
+
+echo "Provisioning complete!"

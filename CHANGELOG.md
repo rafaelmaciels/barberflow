@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Deploy AWS EC2:** Adição de scripts de provisionamento de infraestrutura (`user-data.sh`) para AWS (LEMP stack) e `.env.producao` atualizado para uso do novo servidor e Certificado SSL Let's Encrypt.
 - **Módulo de Gestão de Usuários (RBAC):** Criação de níveis de acesso diferenciados (Administrador vs Funcionário/Barbeiro).
 - **Vínculo de Usuário e Barbeiro:** Ao criar um usuário do tipo "Funcionário", ele é vinculado a um barbeiro específico, restringindo o acesso dele à sua própria agenda e impedindo visualização da agenda de outros.
 - **Proteção contra Exclusão:** Remoção do botão e do acesso para exclusão de agendamentos e transações financeiras para usuários de nível "Funcionário" (somente Administrador pode excluir).
