@@ -38,6 +38,15 @@ O sistema foi projetado para evoluir futuramente para uma plataforma SaaS (Softw
 
 # 🚀 Principais Funcionalidades
 
+## 🎨 Experiência Premium (UI/UX)
+
+- Design moderno, limpo e elegante
+- Modo Claro e Modo Escuro (Dark Mode) nativos com alternância suave
+- Salvamento automático de preferência de tema via LocalStorage
+- Total responsividade para Mobile e Desktop
+
+---
+
 ## 📅 Agendamento Público
 
 Página pública e responsiva (`/`) onde o cliente pode:

@@ -1,12 +1,85 @@
-﻿@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap/dist/css/bootstrap.min.css';
 @import '@fortawesome/fontawesome-free/css/all.min.css';
 
-body {
-    background:#f4f6f9;
+/* 
+ * BarberFlow - Premium Style
+ * Custom CSS for modern UI, animations, and dark mode support
+ */
+
+:root {
+    /* Primary Colors (Azul Premium) */
+    --bs-primary: #0d6efd;
+    --bs-primary-rgb: 13, 110, 253;
+    --bs-primary-hover: #0b5ed7;
+    
+    /* Font family - Default clean modern system font stack */
+    --bs-font-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    
+    /* Smooth Transitions for Theme Toggle */
+    --bf-transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Simple Sidebar Template Styles */
+[data-bs-theme="dark"] {
+    /* Ajustes específicos para o modo escuro */
+    --bs-body-bg: #121212;
+    --bs-body-color: #e0e0e0;
+    --bs-body-color-rgb: 224, 224, 224;
+    --bs-body-bg-rgb: 18, 18, 18;
+    
+    --bs-secondary-bg: #1e1e1e;
+    --bs-tertiary-bg: #2d2d2d;
+    
+    --bs-border-color: #333333;
+    --bs-border-color-translucent: rgba(255, 255, 255, 0.1);
+}
 
+/* Base Styles & Transitions */
+body {
+    font-family: var(--bs-font-sans-serif);
+    transition: var(--bf-transition);
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+/* Component Transitions */
+.card, .navbar, .sidebar-heading, .list-group-item, .btn, .form-control, .form-select, .table, th, td {
+    transition: var(--bf-transition);
+}
+
+/* Premium Card Styles */
+.card {
+    border: 1px solid var(--bs-border-color-translucent);
+    border-radius: 0.75rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    background-color: var(--bs-body-bg);
+}
+
+.card-header {
+    border-bottom: 1px solid var(--bs-border-color-translucent);
+    background-color: transparent;
+    font-weight: 600;
+}
+
+/* Buttons Premium Feel */
+.btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    box-shadow: 0 2px 4px rgba(var(--bs-primary-rgb), 0.2);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: var(--bs-primary-hover);
+    border-color: var(--bs-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(var(--bs-primary-rgb), 0.3);
+}
+
+/* Sidebar Wrapper Styles */
 #wrapper {
     overflow-x: hidden;
 }
@@ -18,15 +91,40 @@ body {
     -moz-transition: margin .25s ease-out;
     -o-transition: margin .25s ease-out;
     transition: margin .25s ease-out;
+    background-color: var(--bs-tertiary-bg); /* Use Bootstrap tertiary bg */
+    border-right: 1px solid var(--bs-border-color-translucent);
 }
 
 #sidebar-wrapper .sidebar-heading {
-    padding: 0.875rem 1.25rem;
-    font-size: 1.2rem;
+    padding: 1.25rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    border-bottom: 1px solid var(--bs-border-color-translucent);
+    background-color: transparent;
 }
 
 #sidebar-wrapper .list-group {
     width: 15rem;
+}
+
+#sidebar-wrapper .list-group-item {
+    background-color: transparent;
+    border: none;
+    padding: 0.85rem 1.25rem;
+    color: var(--bs-body-color);
+    font-weight: 500;
+}
+
+#sidebar-wrapper .list-group-item:hover {
+    background-color: var(--bs-secondary-bg);
+    color: var(--bs-primary);
+}
+
+#sidebar-wrapper .list-group-item.active {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary);
+    border-left: 4px solid var(--bs-primary);
+    font-weight: 600;
 }
 
 #page-content-wrapper {
@@ -48,4 +146,58 @@ body {
     #wrapper.toggled #sidebar-wrapper {
         margin-left: -15rem;
     }
+}
+
+/* Navbar */
+.navbar {
+    background-color: var(--bs-tertiary-bg) !important;
+    border-bottom: 1px solid var(--bs-border-color-translucent);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+[data-bs-theme="dark"] .navbar {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Theme Toggle Button */
+#themeToggleBtn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border: none;
+    background: transparent;
+    color: var(--bs-body-color);
+}
+
+#themeToggleBtn:hover {
+    background-color: var(--bs-secondary-bg);
+}
+
+/* Form Controls */
+.form-control, .form-select {
+    border-radius: 0.5rem;
+    border: 1px solid var(--bs-border-color);
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+/* Tables */
+.table {
+    color: var(--bs-body-color);
+}
+.table > :not(caption) > * > * {
+    background-color: transparent;
+    color: var(--bs-body-color);
+    border-bottom-color: var(--bs-border-color-translucent);
 }
