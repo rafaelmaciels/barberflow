@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configurações do Git e arquivos de documentação (README, CHANGELOG, etc).
 
 ### Fixed
+- Alteração do builder no `railway.json` de NIXPACKS para RAILPACK para forçar o uso do Node.js 22 e resolver incompatibilidades com o Vite 8.
 - Adição do arquivo `railway.json` para executar as migrations automaticamente no processo de Release (contorno para a limitação de terminal no plano gratuito do Railway).
 - Correção nos requisitos do `composer.json` (`ext-gd`, `ext-zip` e `php ^8.4`) para permitir o deploy automático com sucesso no ambiente Nixpacks do Railway.
 - Correção de erro de sintaxe Javascript causado por comentários minificados em uma única linha (afetou o agendamento público, calendário de edição e TV).
