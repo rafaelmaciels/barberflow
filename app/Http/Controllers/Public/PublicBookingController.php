@@ -87,45 +87,19 @@ class PublicBookingController extends Controller
 
         $this->appointmentService->createAppointment($data);
 
-        // Send email via PHPMailer
+        // Send email via Laravel Mail (using configured SMTP in .env)
         try {
-            $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
-            $mail->isSMTP();
-            $mail->Host       = 'venus.svrdedicado.org';
-            $mail->SMTPAuth   = true;
-            $mail->Username   = 'no-reply@thbarbearia.xyz';
-            $mail->Password   = '4jZtGAnjtCDSYrdLvA7w';
-            $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
-            $mail->Port       = 465;
-
-            // Opções para ignorar erros de certificado
-            $mail->SMTPOptions = array(
-                'ssl' => array(
-                    'verify_peer' => false,
-                    'verify_peer_name' => false,
-                    'allow_self_signed' => true
-                )
-            );
-
-            $mail->setFrom('no-reply@thbarbearia.xyz', 'BarberFlow');
-            $mail->addAddress('thiago@thbarbearia.xyz');
-
-            $mail->isHTML(true);
-            $mail->CharSet = 'UTF-8';
-            $mail->Subject = 'Confirmação de Agendamento - BarberFlow';
-            
             $servico = $this->serviceCatalog->getService($data['service_id']);
-            $nomeServico = $servico ? $servico->nome : 'Não informado';
-            $valorServico = $servico ? 'R$ ' . number_format($servico->valor, 2, ',', '.') : 'Não informado';
+            $data['nomeServico'] = $servico ? $servico->nome : 'Não informado';
+            $data['valorServico'] = $servico ? 'R$ ' . number_format($servico->valor, 2, ',', '.') : 'Não informado';
+            $data['dataFormatada'] = date('d/m/Y', strtotime($data['data']));
 
-            $dataFormatada = date('d/m/Y', strtotime($data['data']));
+            // Send notification to the company email
+            $companyEmail = \App\Models\Setting::where('key', 'company_email')->value('value') ?? env('MAIL_FROM_ADDRESS', 'admin@barberflow.com');
             
-            $mail->Body    = "Olá <b>{$data['cliente_nome']}</b>,<br><br>Seu agendamento foi recebido com sucesso na nossa barbearia!<br><br><b>Detalhes:</b><br>- <b>Cliente:</b> {$data['cliente_nome']}<br>- <b>WhatsApp:</b> {$data['cliente_whatsapp']}<br>- <b>Serviço:</b> {$nomeServico}<br>- <b>Data:</b> {$dataFormatada}<br>- <b>Horário:</b> {$data['hora']}<br>- <b>Valor:</b> {$valorServico}<br><br>Aguardamos você no horário marcado!<br><br>Obrigado,<br>Equipe BarberFlow";
-            $mail->AltBody = "Olá {$data['cliente_nome']},\n\nSeu agendamento foi recebido com sucesso!\nCliente: {$data['cliente_nome']}\nWhatsApp: {$data['cliente_whatsapp']}\nServiço: {$nomeServico}\nData: {$dataFormatada}\nHorário: {$data['hora']}\nValor: {$valorServico}";
-
-            $mail->send();
+            Mail::to($companyEmail)->send(new AppointmentCreatedMail($data));
         } catch (\Exception $e) {
-            \Log::error('Erro ao enviar e-mail via PHPMailer: ' . $e->getMessage());
+            \Log::error('Erro ao enviar e-mail via Laravel Mail: ' . $e->getMessage());
         }
 
         return redirect()->route('public.booking')->with('success', 'Uhuul! Seu agendamento foi realizado com sucesso. Esperamos por você!');
