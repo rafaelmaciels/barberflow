@@ -31,7 +31,11 @@ class AppointmentController extends Controller
 
     public function apiEvents()
     {
-        return response()->json($this->appointmentService->getEventsForCalendar());
+        $barberId = null;
+        if (auth()->check() && auth()->user()->isEmployee()) {
+            $barberId = auth()->user()->barber_id;
+        }
+        return response()->json($this->appointmentService->getEventsForCalendar($barberId));
     }
 
     public function create()
@@ -60,6 +64,12 @@ class AppointmentController extends Controller
     public function edit($id)
     {
         $appointment = $this->appointmentService->getAppointment($id);
+        
+        // Se for funcionário, não pode editar agendamento de outro barbeiro
+        if (auth()->user()->isEmployee() && $appointment->barber_id != auth()->user()->barber_id) {
+            abort(403, 'Acesso negado');
+        }
+
         $barbers = $this->barberService->getAllBarbers()->where('ativo', true);
         $services = $this->serviceCatalog->getAllServices()->where('ativo', true);
         
@@ -68,6 +78,11 @@ class AppointmentController extends Controller
 
     public function update(Request $request, $id)
     {
+        $appointment = $this->appointmentService->getAppointment($id);
+        if (auth()->user()->isEmployee() && $appointment->barber_id != auth()->user()->barber_id) {
+            abort(403, 'Acesso negado');
+        }
+
         $request->validate([
             'cliente_nome' => 'required|string|max:255',
             'cliente_whatsapp' => 'required|string|max:20',
@@ -85,6 +100,8 @@ class AppointmentController extends Controller
 
     public function destroy($id)
     {
+        \Illuminate\Support\Facades\Gate::authorize('admin');
+        
         $this->appointmentService->deleteAppointment($id);
         return redirect()->route('appointments.index')->with('success', 'Agendamento removido.');
     }

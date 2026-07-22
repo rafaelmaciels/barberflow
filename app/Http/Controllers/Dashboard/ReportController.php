@@ -57,6 +57,8 @@ class ReportController extends Controller
         $type = $request->get('type', 'appointments');
         $startDate = $request->get('start_date', date('Y-m-01'));
         $endDate = $request->get('end_date', date('Y-m-t'));
+        
+        $employeeBarberId = (auth()->check() && auth()->user()->isEmployee()) ? auth()->user()->barber_id : null;
 
         if ($type === 'appointments') {
             $query = Appointment::with(['barber', 'service'])
@@ -65,7 +67,10 @@ class ReportController extends Controller
             if ($request->filled('status')) {
                 $query->where('status', $request->status);
             }
-            if ($request->filled('barber_id')) {
+            
+            if ($employeeBarberId) {
+                $query->where('barber_id', $employeeBarberId);
+            } elseif ($request->filled('barber_id')) {
                 $query->where('barber_id', $request->barber_id);
             }
 
@@ -84,10 +89,15 @@ class ReportController extends Controller
 
         if ($type === 'services') {
             // Faturamento e qtd por serviço
-            $appointments = Appointment::with('service')
+            $query = Appointment::with('service')
                 ->whereBetween('data', [$startDate, $endDate])
-                ->where('status', 'concluido')
-                ->get();
+                ->where('status', 'concluido');
+                
+            if ($employeeBarberId) {
+                $query->where('barber_id', $employeeBarberId);
+            }
+            
+            $appointments = $query->get();
                 
             $servicesData = [];
             foreach ($appointments as $apt) {
@@ -109,10 +119,15 @@ class ReportController extends Controller
 
         if ($type === 'barbers') {
             // Faturamento e qtd por barbeiro
-            $appointments = Appointment::with(['barber', 'service'])
+            $query = Appointment::with(['barber', 'service'])
                 ->whereBetween('data', [$startDate, $endDate])
-                ->where('status', 'concluido')
-                ->get();
+                ->where('status', 'concluido');
+                
+            if ($employeeBarberId) {
+                $query->where('barber_id', $employeeBarberId);
+            }
+            
+            $appointments = $query->get();
                 
             $barbersData = [];
             foreach ($appointments as $apt) {

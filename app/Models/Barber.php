@@ -21,4 +21,9 @@ class Barber extends Model
     protected $casts = [
         'ativo' => 'boolean',
     ];
+
+    public function user()
+    {
+        return $this->hasOne(User::class);
+    }
 }

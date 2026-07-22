@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Módulo de Gestão de Usuários (RBAC):** Criação de níveis de acesso diferenciados (Administrador vs Funcionário/Barbeiro).
+- **Vínculo de Usuário e Barbeiro:** Ao criar um usuário do tipo "Funcionário", ele é vinculado a um barbeiro específico, restringindo o acesso dele à sua própria agenda e impedindo visualização da agenda de outros.
+- **Proteção contra Exclusão:** Remoção do botão e do acesso para exclusão de agendamentos e transações financeiras para usuários de nível "Funcionário" (somente Administrador pode excluir).
 - Refatoração visual global focada em UI/UX Premium (Design mais limpo e profissional, utilizando o tema Azul).
 - Sistema nativo de Modo Escuro (Dark Mode) acionado por botões ☀️ / 🌙 e persistido via `localStorage`.
 - Limpeza global de classes Bootstrap hardcoded (migração para o sistema de variáveis e esquema de cores automático).

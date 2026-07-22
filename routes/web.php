@@ -37,26 +37,30 @@ Route::middleware(['auth'])->group(function () {
     // Dashboard (Módulo 3: Métricas)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/youtube', [DashboardController::class, 'saveYoutubeLink'])->name('dashboard.youtube');
-    
-    // Módulo 1: Configurações
-    Route::get('/settings', [\App\Http\Controllers\Settings\SettingsController::class, 'index'])->name('settings.index');
-    Route::put('/settings', [\App\Http\Controllers\Settings\SettingsController::class, 'update'])->name('settings.update');
+    // Rotas de Administração (apenas admin)
+    Route::middleware(['can:admin'])->group(function () {
+        // Módulo de Usuários
+        Route::resource('users', \App\Http\Controllers\Users\UserController::class)->except(['show']);
+        
+        // Módulo 1: Configurações
+        Route::get('/settings', [\App\Http\Controllers\Settings\SettingsController::class, 'index'])->name('settings.index');
+        Route::put('/settings', [\App\Http\Controllers\Settings\SettingsController::class, 'update'])->name('settings.update');
 
-    // Módulo 2: Barbeiros
-    Route::resource('barbers', \App\Http\Controllers\Barbers\BarberController::class);
+        // Módulo 2: Barbeiros
+        Route::resource('barbers', \App\Http\Controllers\Barbers\BarberController::class);
 
-    // Módulo 3: Serviços
-    Route::resource('services', \App\Http\Controllers\Services\ServiceController::class);
+        // Módulo 3: Serviços
+        Route::resource('services', \App\Http\Controllers\Services\ServiceController::class);
 
-    // Módulo 4: Agenda
+        // Módulo de Bloqueios de Agenda
+        Route::get('/blocked-times', [\App\Http\Controllers\Dashboard\BlockedTimeController::class, 'index'])->name('blocked-times.index');
+        Route::post('/blocked-times', [\App\Http\Controllers\Dashboard\BlockedTimeController::class, 'store'])->name('blocked-times.store');
+        Route::delete('/blocked-times/{id}', [\App\Http\Controllers\Dashboard\BlockedTimeController::class, 'destroy'])->name('blocked-times.destroy');
+    });
+
+    // Módulo 4: Agenda (Acessível por admins e employees)
     Route::get('appointments/api', [\App\Http\Controllers\Appointments\AppointmentController::class, 'apiEvents'])->name('appointments.api');
     Route::resource('appointments', \App\Http\Controllers\Appointments\AppointmentController::class);
-
-
-    // Módulo de Bloqueios de Agenda
-    Route::get('/blocked-times', [\App\Http\Controllers\Dashboard\BlockedTimeController::class, 'index'])->name('blocked-times.index');
-    Route::post('/blocked-times', [\App\Http\Controllers\Dashboard\BlockedTimeController::class, 'store'])->name('blocked-times.store');
-    Route::delete('/blocked-times/{id}', [\App\Http\Controllers\Dashboard\BlockedTimeController::class, 'destroy'])->name('blocked-times.destroy');
 
     // Módulo de Relatórios (Plano C)
     Route::get('/reports', [\App\Http\Controllers\Dashboard\ReportController::class, 'index'])->name('reports.index');

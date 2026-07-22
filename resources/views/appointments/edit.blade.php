@@ -99,20 +99,26 @@
                     </div>
 
                     <div class="d-flex justify-content-between mt-5 pt-3 border-top">
+                        @can('admin')
                         <button type="button" class="btn btn-outline-danger fw-bold btn-delete">
                             <i class="fa-solid fa-trash me-1"></i> Excluir Registro
                         </button>
+                        @else
+                        <div></div>
+                        @endcan
                         <button type="submit" class="btn btn-primary btn-lg fw-bold px-5 rounded-3">
                             <i class="fa-solid fa-floppy-disk me-2"></i> Salvar Alteracoes
                         </button>
                     </div>
                 </form>
 
+                @can('admin')
                 <!-- Form invisível para delete -->
                 <form id="delete-form" action="{{ route('appointments.destroy', $appointment->id) }}" method="POST" style="display: none;">
                     @csrf
                     @method('DELETE')
                 </form>
+                @endcan
             </div>
         </div>
     </div>

@@ -43,6 +43,8 @@ class FinancialController extends Controller
 
     public function destroy($id)
     {
+        \Illuminate\Support\Facades\Gate::authorize('admin');
+        
         $this->financialService->deleteTransaction($id);
         return redirect()->route('finance.index')->with('success', 'Lançamento excluído com sucesso!');
     }

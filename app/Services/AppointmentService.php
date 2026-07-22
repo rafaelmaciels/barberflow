@@ -57,9 +57,13 @@ class AppointmentService
         return $this->appointmentRepository->delete($id);
     }
 
-    public function getEventsForCalendar()
+    public function getEventsForCalendar($barberId = null)
     {
         $appointments = $this->getAllAppointments();
+        
+        if ($barberId) {
+            $appointments = $appointments->where('barber_id', $barberId);
+        }
         
         $events = [];
         foreach ($appointments as $apt) {

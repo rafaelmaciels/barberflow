@@ -42,6 +42,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Support\Facades\Gate::define('admin', function (\App\Models\User $user) {
+            return $user->isAdmin();
+        });
+
+        \Illuminate\Support\Facades\Gate::define('employee', function (\App\Models\User $user) {
+            return $user->isEmployee();
+        });
     }
 }

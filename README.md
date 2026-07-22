@@ -75,6 +75,15 @@ Página pública e responsiva (`/`) onde o cliente pode:
 
 ---
 
+## 🔑 Gestão de Usuários e Permissões (RBAC)
+
+- Criação de novos usuários com níveis de acesso.
+- Nível **Administrador**: Acesso total ao sistema, configurações e relatórios.
+- Nível **Funcionário**: Acesso restrito à própria agenda (baseado no vínculo com um perfil de barbeiro) e à adição de receitas e despesas.
+- Funcionários são impedidos de excluir (deletar) qualquer registro do sistema (como agendamentos ou itens do caixa).
+
+---
+
 ## ✂️ Gestão de Serviços
 
 - Cadastro de serviços

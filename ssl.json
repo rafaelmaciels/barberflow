@@ -1,0 +1,16 @@
+{
+    "InstanceIds": [
+        "i-082847e5f89fe3d87"
+    ],
+    "DocumentName": "AWS-RunShellScript",
+    "Parameters": {
+        "commands": [
+            "sed -i 's/server_name _;/server_name barberflow.rafaelmaciel.net;/g' /etc/nginx/sites-available/barberflow",
+            "systemctl reload nginx",
+            "export DEBIAN_FRONTEND=noninteractive",
+            "apt-get install -y certbot python3-certbot-nginx",
+            "certbot --nginx -d barberflow.rafaelmaciel.net --non-interactive --agree-tos -m admin@barberflow.com --redirect",
+            "sed -i 's|^APP_URL=.*|APP_URL=https://barberflow.rafaelmaciel.net|g' /var/www/barberflow/.env"
+        ]
+    }
+}
