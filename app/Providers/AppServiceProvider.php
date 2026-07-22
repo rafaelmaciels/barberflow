@@ -42,13 +42,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (config('database.default') === 'sqlite') {
-            $dbPath = config('database.connections.sqlite.database');
-            if ($dbPath === '/tmp/database.sqlite') {
-                if (file_exists($dbPath) && filesize($dbPath) === 0) {
-                    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-                }
-            }
-        }
+        //
     }
 }

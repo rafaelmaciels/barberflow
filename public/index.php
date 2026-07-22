@@ -1,11 +1,5 @@
 <?php
 
-$dbPath = '/tmp/database.sqlite';
-if (!file_exists($dbPath)) {
-    touch($dbPath);
-    chmod($dbPath, 0777);
-}
-
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
