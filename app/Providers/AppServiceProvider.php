@@ -44,9 +44,11 @@ class AppServiceProvider extends ServiceProvider
     {
         if (config('database.default') === 'sqlite') {
             $dbPath = config('database.connections.sqlite.database');
-            if ($dbPath === '/tmp/database.sqlite' && !file_exists($dbPath)) {
-                touch($dbPath);
-                \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+            if (strpos($dbPath, 'storage/database.sqlite') !== false) {
+                // Se o arquivo acabou de ser criado e está vazio (0 bytes), roda as migrações
+                if (file_exists($dbPath) && filesize($dbPath) === 0) {
+                    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+                }
             }
         }
     }

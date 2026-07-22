@@ -1,5 +1,10 @@
 <?php
 
+$dbPath = __DIR__.'/../storage/database.sqlite';
+if (!file_exists($dbPath)) {
+    touch($dbPath);
+}
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
