@@ -17,8 +17,7 @@
         "@popperjs/core": "^2.11.8",
         "bootstrap": "^5.3.8",
         "datatables.net-bs5": "^2.3.8",
-        "sweetalert2": "^11.26.25",
-        "mysql2": "^3.10.0"
+        "sweetalert2": "^11.26.25"
     },
     "engines": {
         "node": "22.x"
