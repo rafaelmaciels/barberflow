@@ -44,8 +44,7 @@ class AppServiceProvider extends ServiceProvider
     {
         if (config('database.default') === 'sqlite') {
             $dbPath = config('database.connections.sqlite.database');
-            if (strpos($dbPath, 'storage/database.sqlite') !== false) {
-                // Se o arquivo acabou de ser criado e está vazio (0 bytes), roda as migrações
+            if ($dbPath === '/tmp/database.sqlite') {
                 if (file_exists($dbPath) && filesize($dbPath) === 0) {
                     \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
                 }
