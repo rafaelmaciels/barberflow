@@ -1,8 +1,9 @@
 const mysql = require('mysql2');
-const host = process.env.MYSQLHOST;
-const port = process.env.MYSQLPORT;
-const user = process.env.MYSQLUSER;
-const pass = process.env.MYSQLPASSWORD;
+const host = process.env.MYSQLHOST || process.env.DB_HOST;
+const port = process.env.MYSQLPORT || process.env.DB_PORT || 3306;
+const user = process.env.MYSQLUSER || process.env.DB_USERNAME;
+const pass = process.env.MYSQLPASSWORD || process.env.DB_PASSWORD;
+const db   = process.env.MYSQLDATABASE || process.env.DB_DATABASE;
 
 if (!host || !user || !pass) {
     console.log("Variáveis nativas do Railway não encontradas. Ignorando fix.");
