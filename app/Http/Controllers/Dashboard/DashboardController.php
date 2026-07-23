@@ -31,6 +31,9 @@ class DashboardController extends Controller
      */
     public function index(): View
     {
+        // Limpeza automática de agendamentos vencidos há mais de 1h
+        \App\Models\Appointment::autoCancelExpired();
+
         // 1. Dados de Agendamentos (Hoje)
         $today = date('Y-m-d');
         $allAppointments = $this->appointmentService->getAllAppointments();
@@ -55,7 +58,12 @@ class DashboardController extends Controller
         // 3. Dados de Profissionais
         $totalBarbeirosAtivos = $this->barberService->getAllBarbers()->where('ativo', true)->count();
 
-        // 4. Últimos 5 agendamentos gerais para exibir na tabela
+        // 4. Fila de Atendimento (Hoje - Pendentes)
+        $filaAtendimentos = $appointmentsToday
+            ->whereIn('status', ['agendado', 'em_atendimento', 'remarcado'])
+            ->sortBy('hora');
+
+        // 5. Últimos 5 agendamentos gerais para exibir na tabela
         $recentAppointments = $allAppointments->sortByDesc('created_at')->take(5);
 
         // 5. Configuração do YouTube
@@ -68,9 +76,51 @@ class DashboardController extends Controller
             'despesaMensal',
             'lucroMensal',
             'totalBarbeirosAtivos',
+            'filaAtendimentos',
             'recentAppointments',
             'youtubeLink'
         ));
+    }
+
+    public function stats()
+    {
+        // Limpeza automática de agendamentos vencidos há mais de 1h
+        \App\Models\Appointment::autoCancelExpired();
+
+        // 1. Dados de Agendamentos (Hoje)
+        $today = date('Y-m-d');
+        $allAppointments = $this->appointmentService->getAllAppointments();
+        $appointmentsToday = $allAppointments->where('data', $today);
+        $totalAgendamentosHoje = $appointmentsToday->count();
+        $agendamentosConcluidos = $appointmentsToday->where('status', 'concluido')->count();
+
+        // 2. Dados Financeiros (Mês Atual)
+        $currentMonth = date('m');
+        $currentYear = date('Y');
+        
+        $transactions = $this->financialService->getAllTransactions()
+            ->filter(function($trans) use ($currentMonth, $currentYear) {
+                return $trans->data->format('m') === $currentMonth && 
+                       $trans->data->format('Y') === $currentYear;
+            });
+            
+        $receitaMensal = $transactions->where('tipo', 'entrada')->sum('valor');
+        $despesaMensal = $transactions->where('tipo', 'saida')->sum('valor');
+        $lucroMensal = $receitaMensal - $despesaMensal;
+
+        $filaAtendimentos = $appointmentsToday
+            ->whereIn('status', ['agendado', 'em_atendimento', 'remarcado'])
+            ->count();
+
+        return response()->json([
+            'totalAgendamentosHoje' => $totalAgendamentosHoje,
+            'agendamentosConcluidos' => $agendamentosConcluidos,
+            'receitaMensal' => number_format($receitaMensal, 2, ',', '.'),
+            'despesaMensal' => number_format($despesaMensal, 2, ',', '.'),
+            'lucroMensal' => number_format($lucroMensal, 2, ',', '.'),
+            'lucroColorClass' => $lucroMensal < 0 ? 'text-danger' : 'text-info',
+            'filaAguardando' => $filaAtendimentos
+        ]);
     }
 
     public function saveYoutubeLink(Request $request)

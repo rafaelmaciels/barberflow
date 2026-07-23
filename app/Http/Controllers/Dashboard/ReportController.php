@@ -74,7 +74,7 @@ class ReportController extends Controller
                 $query->where('barber_id', $request->barber_id);
             }
 
-            return $query->orderBy('data', 'desc')->orderBy('hora', 'desc')->get();
+            return $query->orderBy('data', 'desc')->orderBy('hora', 'desc')->orderBy('id', 'desc')->get();
         }
 
         if ($type === 'finance') {
@@ -84,7 +84,7 @@ class ReportController extends Controller
                 $query->where('tipo', $request->transaction_type);
             }
             
-            return $query->orderBy('data', 'desc')->get();
+            return $query->orderBy('data', 'desc')->orderBy('id', 'desc')->get();
         }
 
         if ($type === 'services') {

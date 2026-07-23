@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Cancelamento Automático (Tolerância):** Nova regra no Model de Agendamentos que converte automaticamente para "cancelado" clientes aguardando há mais de 1 hora do horário marcado. A limpeza é disparada silenciosamente através da atualização da TV ou acessos ao Painel.
 - **Pipeline CI/CD (GitHub Actions):** Deploy automatizado (`deploy-demo.yml`) configurado para atualizar a instância de Demonstração na AWS usando AWS Systems Manager (SSM) a cada push na branch principal.
 - **Serviço de Cortesia (Fidelidade):** Novo atributo `is_admin_only` (Exclusivo para Administração) em Serviços. Permite criar serviços invisíveis para clientes no site e para funcionários no painel. Somente Administradores podem aplicar esses serviços nos agendamentos.
 - **Deploy AWS EC2:** Adição de scripts de provisionamento de infraestrutura (`user-data.sh`) para AWS (LEMP stack) e `.env.producao` atualizado para uso do novo servidor e Certificado SSL Let's Encrypt.
@@ -27,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configurações do Git e arquivos de documentação (README, CHANGELOG, etc).
 
 ### Fixed
+- **Filtros de Relatório Financeiro:** Correção no backend e front-end para usar os enumeradores corretos do banco de dados (`entrada`/`saida`) no lugar de `receita`/`despesa`, resolvendo o problema de resultados em branco no filtro.
+- **Ordenação de Relatórios e Financeiro:** Forçada a ordenação combinada por `data`, `hora` e `id` (descendente) no backend (e ajuste na renderização do DataTables) para garantir que os lançamentos mais recentes fiquem de fato no topo da lista, superando a ambiguidade quando existem várias transações na mesma data.
 - Alteração do builder no `railway.json` de NIXPACKS para RAILPACK para forçar o uso do Node.js 22 e resolver incompatibilidades com o Vite 8.
 - Adição do arquivo `railway.json` para executar as migrations automaticamente no processo de Release (contorno para a limitação de terminal no plano gratuito do Railway).
 - Correção nos requisitos do `composer.json` (`ext-gd`, `ext-zip` e `php ^8.4`) para permitir o deploy automático com sucesso no ambiente Nixpacks do Railway.

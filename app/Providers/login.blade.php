@@ -53,7 +53,7 @@
 
                 <p class="mt-5 mb-3 text-muted text-center">
                     BarberFlow &copy; {{ date('Y') }}<br>
-                    Desenvolvido por Rafael Maciel
+                    Desenvolvido por <a href="https://rafaelmaciel.net">Rafael Maciel
                 </p>
             </form>
         </div>

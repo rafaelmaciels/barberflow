@@ -13,15 +13,18 @@ class AppointmentController extends Controller
     protected $appointmentService;
     protected $barberService;
     protected $serviceCatalog;
+    protected $financialService;
 
     public function __construct(
         AppointmentService $appointmentService,
         BarberService $barberService,
-        ServiceCatalogService $serviceCatalog
+        ServiceCatalogService $serviceCatalog,
+        \App\Services\FinancialService $financialService
     ) {
         $this->appointmentService = $appointmentService;
         $this->barberService = $barberService;
         $this->serviceCatalog = $serviceCatalog;
+        $this->financialService = $financialService;
     }
 
     public function index()
@@ -110,5 +113,47 @@ class AppointmentController extends Controller
         
         $this->appointmentService->deleteAppointment($id);
         return redirect()->route('appointments.index')->with('success', 'Agendamento removido.');
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:agendado,em_atendimento,concluido,cancelado,remarcado'
+        ]);
+
+        $appointment = $this->appointmentService->getAppointment($id);
+        if (auth()->user()->isEmployee() && $appointment->barber_id != auth()->user()->barber_id) {
+            return response()->json(['success' => false, 'message' => 'Acesso negado'], 403);
+        }
+
+        $oldStatus = $appointment->status;
+        $appointment->status = $request->status;
+        $appointment->save();
+
+        // Se o status mudou para concluído, gera a entrada financeira automaticamente
+        if ($oldStatus !== 'concluido' && $request->status === 'concluido') {
+            $desc = "Atendimento: {$appointment->service->nome} - {$appointment->cliente_nome}";
+            
+            // Verifica se já existe uma transação idêntica (mesma descrição, valor e data) para evitar duplicatas em cliques rápidos ou toggles
+            $exists = $this->financialService->getAllTransactions()
+                ->where('descricao', $desc)
+                ->where('data', date('Y-m-d'))
+                ->where('valor', (string)$appointment->service->valor)
+                ->first();
+
+            if (!$exists) {
+                $this->financialService->createTransaction([
+                    'tipo' => 'entrada',
+                    'descricao' => $desc,
+                    'valor' => (string)$appointment->service->valor,
+                    'data' => date('Y-m-d')
+                ]);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status atualizado com sucesso!'
+        ]);
     }
 }

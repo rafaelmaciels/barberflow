@@ -51,14 +51,12 @@ O sistema foi projetado para evoluir futuramente para uma plataforma SaaS (Softw
 
 Página pública e responsiva (`/`) onde o cliente pode:
 
-- Escolher o serviço
-- Escolher o barbeiro (ou livre)
-- Escolher Data e Hora baseado na disponibilidade em tempo real
-- Acompanhar a **Fila Ao Vivo** (quantas pessoas já agendadas na frente)
-- Verificação Anti-Bot embutida (anti-spam)
-- Seleção de barbeiro
-- Seleção de serviço
-- Confirmação automática
+- [x] Escolher o serviço e barbeiro
+- [x] Escolher Data e Hora baseado na disponibilidade em tempo real
+- [x] Acompanhar a **Fila Ao Vivo** (quantas pessoas já agendadas na frente)
+- [x] Verificação Anti-Bot embutida (anti-spam)
+- [x] Confirmação automática
+- [x] Cancelamento automático: Clientes que agendam e não comparecem têm seu status alterado para "cancelado" após 1 hora de tolerância.
 
 ---
 
@@ -154,11 +152,12 @@ A gerência tem total controle sobre os horários da barbearia:
 
 O módulo de relatórios é uma central de inteligência do negócio:
 
-- **Agendamentos:** Filtre por data, barbeiro e status (Concluído, Cancelado, Não Compareceu).
-- **Financeiro:** Acompanhe o fluxo de caixa, totalizando receitas e despesas.
-- **Desempenho de Serviços:** Ranking dos serviços mais populares e que mais geram faturamento.
-- **Desempenho de Barbeiros:** Ranking de quem mais atende e mais contribui financeiramente.
-- **Exportação Universal:** Exporte todos os relatórios nativamente em formato **PDF** ou **Excel (.xlsx)**.
+- [x] **Agendamentos:** Filtre por data, barbeiro e status (Concluído, Cancelado, Não Compareceu).
+- [x] **Financeiro:** Acompanhe o fluxo de caixa, totalizando entradas (receitas) e saídas (despesas).
+- [x] **Desempenho de Serviços:** Ranking dos serviços mais populares e que mais geram faturamento.
+- [x] **Desempenho de Barbeiros:** Ranking de quem mais atende e mais contribui financeiramente.
+- [x] **Ordenação Inteligente:** Dados ordenados com precisão por data, hora e ordem de registro (ID) mais recente.
+- [x] **Exportação Universal:** Exporte todos os relatórios nativamente em formato **PDF** ou **Excel (.xlsx)**.
 
 ---
 

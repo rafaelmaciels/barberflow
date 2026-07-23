@@ -36,6 +36,7 @@ Route::get('/fila/dados', [QueueController::class, 'data'])->name('queue.data');
 Route::middleware(['auth'])->group(function () {
     // Dashboard (Módulo 3: Métricas)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/stats', [DashboardController::class, 'stats'])->name('dashboard.stats');
     Route::post('/dashboard/youtube', [DashboardController::class, 'saveYoutubeLink'])->name('dashboard.youtube');
     // Rotas de Administração (apenas admin)
     Route::middleware(['can:admin'])->group(function () {
@@ -60,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Módulo 4: Agenda (Acessível por admins e employees)
     Route::get('appointments/api', [\App\Http\Controllers\Appointments\AppointmentController::class, 'apiEvents'])->name('appointments.api');
+    Route::post('appointments/{id}/status', [\App\Http\Controllers\Appointments\AppointmentController::class, 'updateStatus'])->name('appointments.status.update');
     Route::resource('appointments', \App\Http\Controllers\Appointments\AppointmentController::class);
 
     // Módulo de Relatórios (Plano C)

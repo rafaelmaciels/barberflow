@@ -24,21 +24,21 @@ class QueueController extends Controller
 
     public function data()
     {
-        // Pega todos os agendamentos de HOJE que estão 'agendado'
+        // Limpeza automática de agendamentos vencidos há mais de 1h
+        \App\Models\Appointment::autoCancelExpired();
+
+        // Pega todos os agendamentos de HOJE que não estão concluídos ou cancelados
         $appointments = \App\Models\Appointment::with(['barber', 'service'])
             ->where('data', date('Y-m-d'))
-            ->where('status', 'agendado')
+            ->whereIn('status', ['agendado', 'em_atendimento', 'remarcado'])
             ->orderBy('hora', 'asc')
             ->get();
 
-        $now = date('H:i:s');
         $emAtendimento = [];
         $proximos = [];
 
         foreach ($appointments as $apt) {
-            // Regra simples: se o horário do agendamento já passou ou é agora, está em atendimento/atrasado
-            // Se for no futuro, está na fila.
-            if ($apt->hora <= $now) {
+            if ($apt->status === 'em_atendimento') {
                 $emAtendimento[] = $apt;
             } else {
                 $proximos[] = $apt;

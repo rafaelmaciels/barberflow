@@ -9,8 +9,8 @@ class FinancialRepository implements FinancialRepositoryInterface
 {
     public function all()
     {
-        // Ordena por data decrescente (mais recentes primeiro)
-        return FinancialTransaction::orderBy('data', 'desc')->get();
+        // Ordena por data decrescente e id decrescente (mais recentes primeiro)
+        return FinancialTransaction::orderBy('data', 'desc')->orderBy('id', 'desc')->get();
     }
 
     public function find(int $id)
