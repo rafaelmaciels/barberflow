@@ -6,13 +6,15 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
+    var isMobile = window.innerWidth < 768;
+
     var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'timeGridWeek',
+        initialView: isMobile ? 'timeGridDay' : 'timeGridWeek',
         locale: 'pt-br',
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+            right: isMobile ? 'timeGridDay,listWeek' : 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
         },
         slotMinTime: '08:00:00',
         slotMaxTime: '22:00:00',
@@ -23,11 +25,41 @@ document.addEventListener('DOMContentLoaded', function() {
             if (info.event.url) {
                 window.location.href = info.event.url;
             }
+        },
+        windowResize: function(view) {
+            if (window.innerWidth < 768) {
+                calendar.changeView('timeGridDay');
+            } else {
+                calendar.changeView('timeGridWeek');
+            }
         }
     });
     calendar.render();
 });
-</script> <style> /* Pequeno ajuste para as cores do FullCalendar combinarem com o Bootstrap 5 */ .fc-theme-standard td, .fc-theme-standard th { border-color: #dee2e6; } .fc-col-header-cell-cushion, .fc-daygrid-day-number { text-decoration: none; color: #495057; } .fc-event { cursor: pointer; border: none; border-radius: 4px; padding: 2px; } .fc-timegrid-event .fc-event-main { padding: 4px; }
+</script> 
+<style> 
+/* Pequeno ajuste para as cores do FullCalendar combinarem com o Bootstrap 5 */ 
+.fc-theme-standard td, .fc-theme-standard th { border-color: #dee2e6; } 
+.fc-col-header-cell-cushion, .fc-daygrid-day-number { text-decoration: none; color: #495057; } 
+.fc-event { cursor: pointer; border: none; border-radius: 4px; padding: 2px; } 
+.fc-timegrid-event .fc-event-main { padding: 4px; }
+
+/* Melhorias para dispositivos móveis */
+@media (max-width: 767px) {
+    .fc-header-toolbar {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .fc-toolbar-title {
+        font-size: 1.25rem !important;
+        text-align: center;
+    }
+    .fc-toolbar-chunk {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+}
 </style>
 @endsection
 
