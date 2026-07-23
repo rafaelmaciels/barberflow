@@ -26,8 +26,8 @@ class SettingsController extends Controller
 
         // Lidar com o upload da Logo
         if ($request->hasFile('logo')) {
-            $path = $request->file('logo')->store('public/settings');
-            $url = Storage::url($path);
+            $path = $request->file('logo')->store('settings', 'public');
+            $url = Storage::disk('public')->url($path);
             Setting::updateOrCreate(['key' => 'company_logo'], ['value' => $url]);
         }
 

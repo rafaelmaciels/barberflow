@@ -28,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configurações do Git e arquivos de documentação (README, CHANGELOG, etc).
 
 ### Fixed
+- **Upload de Imagens:** Atualização no `SettingsController` e `BarberService` para explicitamente utilizar o disco `public` padrão de uploads no Laravel 11, corrigindo o problema de imagens que não carregavam.
+- **Exclusão de Barbeiros:** Correção no botão de excluir da página de Barbeiros para utilizar o evento `onsubmit` padrão, resolvendo a falha no funcionamento que existia devido à lógica do SweetAlert.
 - **Filtros de Relatório Financeiro:** Correção no backend e front-end para usar os enumeradores corretos do banco de dados (`entrada`/`saida`) no lugar de `receita`/`despesa`, resolvendo o problema de resultados em branco no filtro.
 - **Ordenação de Relatórios e Financeiro:** Forçada a ordenação combinada por `data`, `hora` e `id` (descendente) no backend (e ajuste na renderização do DataTables) para garantir que os lançamentos mais recentes fiquem de fato no topo da lista, superando a ambiguidade quando existem várias transações na mesma data.
 - Alteração do builder no `railway.json` de NIXPACKS para RAILPACK para forçar o uso do Node.js 22 e resolver incompatibilidades com o Vite 8.

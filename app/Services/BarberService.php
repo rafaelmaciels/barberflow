@@ -27,8 +27,8 @@ class BarberService
     public function createBarber(array $data, $photo = null)
     {
         if ($photo) {
-            $path = $photo->store('public/barbers');
-            $data['foto'] = Storage::url($path);
+            $path = $photo->store('barbers', 'public');
+            $data['foto'] = Storage::disk('public')->url($path);
         }
 
         $data['ativo'] = isset($data['ativo']) ? true : false;
@@ -39,8 +39,8 @@ class BarberService
     public function updateBarber(int $id, array $data, $photo = null)
     {
         if ($photo) {
-            $path = $photo->store('public/barbers');
-            $data['foto'] = Storage::url($path);
+            $path = $photo->store('barbers', 'public');
+            $data['foto'] = Storage::disk('public')->url($path);
         }
 
         $data['ativo'] = isset($data['ativo']) ? true : false;
