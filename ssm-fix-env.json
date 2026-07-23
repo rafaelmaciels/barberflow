@@ -1,0 +1,21 @@
+{
+    "InstanceIds": [
+        "i-04bfb2984c8a0b7ee"
+    ],
+    "DocumentName": "AWS-RunShellScript",
+    "Parameters": {
+        "commands": [
+            "cd /var/www/barberflow",
+            "cp .env.producao .env",
+            "sed -i 's/DB_DATABASE=nome_do_banco_criado/DB_DATABASE=barberflow/' .env",
+            "sed -i 's/DB_USERNAME=usuario_do_banco_criado/DB_USERNAME=barberflow/' .env",
+            "sed -i 's/DB_PASSWORD=senha_do_banco_criado/DB_PASSWORD=BarberFlow123!/' .env",
+            "sed -i \"s/env('APP_INSTALLED', false)/env('APP_INSTALLED', true)/\" app/Http/Middleware/CheckInstallation.php",
+            "php artisan config:clear",
+            "php artisan cache:clear",
+            "php artisan route:clear",
+            "php artisan view:clear",
+            "chown -R www-data:www-data /var/www/barberflow"
+        ]
+    }
+}

@@ -67,6 +67,8 @@ return [
 
     'timezone' => 'America/Sao_Paulo',
 
+    'installed' => env('APP_INSTALLED', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration

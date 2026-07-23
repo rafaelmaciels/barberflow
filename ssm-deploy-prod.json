@@ -1,0 +1,19 @@
+{
+    "InstanceIds": [
+        "i-04bfb2984c8a0b7ee"
+    ],
+    "DocumentName": "AWS-RunShellScript",
+    "Parameters": {
+        "commands": [
+            "cd /var/www/barberflow",
+            "aws s3 sync s3://barberflow-deploy-bucket-2026/ . --delete",
+            "chown -R www-data:www-data /var/www/barberflow",
+            "chmod -R 775 /var/www/barberflow/storage /var/www/barberflow/bootstrap/cache",
+            "php artisan migrate --force",
+            "php artisan config:cache",
+            "php artisan route:cache",
+            "php artisan view:cache",
+            "systemctl reload nginx"
+        ]
+    }
+}

@@ -15,7 +15,7 @@ class CheckInstallation
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $isInstalled = env('APP_INSTALLED', false);
+        $isInstalled = config('app.installed', false);
         $isInstallRoute = $request->is('install*');
 
         if (!$isInstalled && !$isInstallRoute) {
