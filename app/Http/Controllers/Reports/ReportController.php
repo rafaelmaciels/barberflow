@@ -62,6 +62,20 @@ class ReportController extends Controller
                 return $transDate->between($start, $end);
             });
 
+        if (request()->filled('forma_pagamento') && request('type') == 'finance') {
+            $forma = request('forma_pagamento');
+            $transactions = $transactions->filter(function($trans) use ($forma) {
+                return $trans->forma_pagamento == $forma;
+            });
+        }
+
+        if (request()->filled('transaction_type') && request('type') == 'finance') {
+            $tipo = request('transaction_type');
+            $transactions = $transactions->filter(function($trans) use ($tipo) {
+                return $trans->tipo == $tipo;
+            });
+        }
+
         $totalAppointments = $appointments->count();
         $completed = $appointments->where('status', 'concluido')->count();
         $cancelled = $appointments->where('status', 'cancelado')->count();

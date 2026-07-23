@@ -137,6 +137,7 @@ Pode ser utilizada em televisores da recepção.
 - Fluxo de caixa
 - Receitas
 - Despesas
+- Formas de Pagamento (Pix, Crédito, Débito, Espécie)
 - Fechamento diário
 - Fechamento mensal
 ## 🔐 Bloqueio de Agenda e Férias

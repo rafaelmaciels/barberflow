@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Formas de Pagamento:** Ao concluir um agendamento, o sistema agora solicita a forma de pagamento (Pix, Crédito, Débito, Espécie) e salva automaticamente o tipo da transação no relatório financeiro, incluindo filtros por forma de pagamento.
 - **Cancelamento Automático (Tolerância):** Nova regra no Model de Agendamentos que converte automaticamente para "cancelado" clientes aguardando há mais de 1 hora do horário marcado. A limpeza é disparada silenciosamente através da atualização da TV ou acessos ao Painel.
 - **Pipeline CI/CD (GitHub Actions):** Deploy automatizado (`deploy-demo.yml`) configurado para atualizar a instância de Demonstração na AWS usando AWS Systems Manager (SSM) a cada push na branch principal.
 - **Serviço de Cortesia (Fidelidade):** Novo atributo `is_admin_only` (Exclusivo para Administração) em Serviços. Permite criar serviços invisíveis para clientes no site e para funcionários no painel. Somente Administradores podem aplicar esses serviços nos agendamentos.
