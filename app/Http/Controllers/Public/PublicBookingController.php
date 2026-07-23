@@ -177,8 +177,8 @@ class PublicBookingController extends Controller
         $today = date('Y-m-d');
         $currentTime = date('H:i');
         
-        $proximosAtendimentos = \App\Models\Appointment::with('barber')
-            ->where('data', $today)
+        $proximosAtendimentos = \App\Models\Appointment::with(['barber', 'service'])
+            ->whereDate('data', date('Y-m-d'))
             ->whereIn('status', ['agendado', 'em_atendimento'])
             ->where('hora', '>=', $currentTime)
             ->orderBy('hora', 'asc')
@@ -186,7 +186,7 @@ class PublicBookingController extends Controller
             ->map(function ($apt) {
                 return [
                     'cliente_nome' => explode(' ', $apt->cliente_nome)[0],
-                    'barber_nome' => $apt->barber->nome,
+                    'service_nome' => $apt->service ? $apt->service->nome : 'Serviço',
                     'hora' => \Carbon\Carbon::parse($apt->hora)->format('H:i')
                 ];
             });
