@@ -146,7 +146,8 @@ class AppointmentController extends Controller
                     'tipo' => 'entrada',
                     'descricao' => $desc,
                     'valor' => (string)$appointment->service->valor,
-                    'data' => date('Y-m-d')
+                    'data' => date('Y-m-d'),
+                    'forma_pagamento' => $request->forma_pagamento
                 ]);
             }
         }

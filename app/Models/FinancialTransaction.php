@@ -14,6 +14,7 @@ class FinancialTransaction extends Model
         'descricao',
         'valor',
         'data',
+        'forma_pagamento',
     ];
 
     protected $casts = [

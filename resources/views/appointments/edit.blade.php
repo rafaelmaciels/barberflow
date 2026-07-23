@@ -29,12 +29,13 @@
                     <h5 class="fw-bold mb-3 border-bottom pb-2">Status do Atendimento</h5>
                     <div class="row mb-4">
                         <div class="col-md-12">
-                            <select name="status" class="form-select form-select-lg {{ $appointment->status == 'concluido' ? 'bg-success text-white' : ($appointment->status == 'cancelado' ? 'bg-danger text-white' : ($appointment->status == 'nao_compareceu' ? 'bg-warning text-body' : 'bg-primary text-white')) }} fw-bold" required>
+                            <select name="status" id="status_select" class="form-select form-select-lg {{ $appointment->status == 'concluido' ? 'bg-success text-white' : ($appointment->status == 'cancelado' ? 'bg-danger text-white' : ($appointment->status == 'nao_compareceu' ? 'bg-warning text-body' : 'bg-primary text-white')) }} fw-bold" required>
                                 <option value="agendado" {{ $appointment->status == 'agendado' ? 'selected' : '' }}>AGENDADO</option>
                                 <option value="concluido" {{ $appointment->status == 'concluido' ? 'selected' : '' }}>CONCLUIDO (Servico Realizado)</option>
                                 <option value="cancelado" {{ $appointment->status == 'cancelado' ? 'selected' : '' }}>CANCELADO</option>
                                 <option value="nao_compareceu" {{ $appointment->status == 'nao_compareceu' ? 'selected' : '' }}>NAO COMPARECEU (No Show)</option>
                             </select>
+                            <input type="hidden" name="forma_pagamento" id="forma_pagamento">
                             <small class="text-muted mt-1 d-block">Alterar o status atualizara a cor na agenda instantaneamente.</small>
                         </div>
                     </div>
@@ -147,6 +148,56 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 if (confirm('Tem certeza que deseja excluir do banco de dados?')) {
                     document.getElementById('delete-form').submit();
+                }
+            }
+        });
+    }
+    const mainForm = document.querySelector('form[method="POST"][action*="appointments"]');
+    if (mainForm && !mainForm.id) { // To distinguish from delete-form
+        mainForm.addEventListener('submit', function(e) {
+            const statusSelect = document.getElementById('status_select');
+            const formaPagamentoInput = document.getElementById('forma_pagamento');
+            
+            if (statusSelect.value === 'concluido' && formaPagamentoInput.value === '') {
+                e.preventDefault();
+                
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Forma de Pagamento',
+                        text: 'Selecione a forma de pagamento utilizada pelo cliente:',
+                        icon: 'question',
+                        input: 'select',
+                        inputOptions: {
+                            'Pix': 'Pix',
+                            'Crédito': 'Cartão de Crédito',
+                            'Débito': 'Cartão de Débito',
+                            'Espécie': 'Dinheiro (Espécie)'
+                        },
+                        inputPlaceholder: 'Selecione...',
+                        showCancelButton: true,
+                        confirmButtonText: 'Confirmar Fechamento',
+                        cancelButtonText: 'Cancelar',
+                        inputValidator: (value) => {
+                            return new Promise((resolve) => {
+                                if (value !== '') {
+                                    resolve();
+                                } else {
+                                    resolve('Você precisa selecionar uma forma de pagamento.');
+                                }
+                            });
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            formaPagamentoInput.value = result.value;
+                            mainForm.submit();
+                        }
+                    });
+                } else {
+                    let method = prompt('Digite a forma de pagamento (Pix, Crédito, Débito, Espécie):');
+                    if (method) {
+                        formaPagamentoInput.value = method;
+                        mainForm.submit();
+                    }
                 }
             }
         });

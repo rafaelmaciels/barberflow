@@ -83,6 +83,9 @@ class ReportController extends Controller
             if ($request->filled('transaction_type')) {
                 $query->where('tipo', $request->transaction_type);
             }
+            if ($request->filled('forma_pagamento')) {
+                $query->where('forma_pagamento', $request->forma_pagamento);
+            }
             
             return $query->orderBy('data', 'desc')->orderBy('id', 'desc')->get();
         }

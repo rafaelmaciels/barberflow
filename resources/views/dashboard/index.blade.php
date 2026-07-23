@@ -99,20 +99,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 'remarcado': '#cff4fc',
                 'cancelado': '#f8d7da'
             };
-            
-            row.style.backgroundColor = colors[newStatus] || 'inherit';
 
-            fetch(`/appointments/${appointmentId}/status`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ status: newStatus })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+            const sendStatusUpdate = (paymentMethod = null) => {
+                selectElement.disabled = true;
+                row.style.backgroundColor = colors[newStatus] || 'inherit';
+
+                const bodyData = { status: newStatus };
+                if (paymentMethod) {
+                    bodyData.forma_pagamento = paymentMethod;
+                }
+
+                fetch(`/appointments/${appointmentId}/status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify(bodyData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
                     Swal.fire({
                         toast: true,
                         position: 'top-end',
@@ -162,10 +169,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(error => {
-                selectElement.disabled = false;
                 console.error('Error:', error);
-                Swal.fire('Erro', 'Ocorreu um erro na requisição.', 'error');
+                Swal.fire('Erro', 'Ocorreu um erro ao atualizar o status.', 'error');
+                selectElement.disabled = false;
             });
+            };
+
+            if (newStatus === 'concluido') {
+                Swal.fire({
+                    title: 'Forma de Pagamento',
+                    text: 'Selecione a forma de pagamento utilizada pelo cliente:',
+                    icon: 'question',
+                    input: 'select',
+                    inputOptions: {
+                        'Pix': 'Pix',
+                        'Crédito': 'Cartão de Crédito',
+                        'Débito': 'Cartão de Débito',
+                        'Espécie': 'Dinheiro (Espécie)'
+                    },
+                    inputPlaceholder: 'Selecione...',
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirmar Fechamento',
+                    cancelButtonText: 'Cancelar',
+                    inputValidator: (value) => {
+                        return new Promise((resolve) => {
+                            if (value !== '') {
+                                resolve();
+                            } else {
+                                resolve('Você precisa selecionar uma forma de pagamento.');
+                            }
+                        });
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        sendStatusUpdate(result.value);
+                    } else {
+                        // User cancelled, revert select to old value
+                        window.location.reload();
+                    }
+                });
+            } else {
+                sendStatusUpdate();
+            }
         });
     });
 });

@@ -44,7 +44,8 @@ class AppointmentService
                     'tipo' => 'entrada',
                     'descricao' => 'Serviço: ' . $updatedAppointment->service->nome . ' (Cliente: ' . $updatedAppointment->cliente_nome . ')',
                     'valor' => $updatedAppointment->service->valor,
-                    'data' => date('Y-m-d')
+                    'data' => date('Y-m-d'),
+                    'forma_pagamento' => $data['forma_pagamento'] ?? null
                 ]);
             }
         }
