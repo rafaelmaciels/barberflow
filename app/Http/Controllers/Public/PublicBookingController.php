@@ -30,7 +30,7 @@ class PublicBookingController extends Controller
     public function index()
     {
         $barbers = $this->barberService->getAllBarbers()->where('ativo', true);
-        $services = $this->serviceCatalog->getAllServices()->where('ativo', true);
+        $services = $this->serviceCatalog->getAllServices()->where('ativo', true)->where('is_admin_only', false);
         
         $settings = Setting::all()->pluck('value', 'key');
         

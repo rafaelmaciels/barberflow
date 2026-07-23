@@ -1,0 +1,12 @@
+{
+    "InstanceIds": [
+        "i-082847e5f89fe3d87"
+    ],
+    "DocumentName": "AWS-RunShellScript",
+    "Parameters": {
+        "commands": [
+            "cd /var/www/barberflow",
+            "php artisan tinker --execute=\"App\\\\Models\\\\Setting::updateOrCreate(['key' => 'company_email'], ['value' => 'rafaelsmaciels@gmail.com']);\""
+        ]
+    }
+}

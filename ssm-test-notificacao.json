@@ -1,0 +1,13 @@
+{
+    "InstanceIds": [
+        "i-04bfb2984c8a0b7ee"
+    ],
+    "DocumentName": "AWS-RunShellScript",
+    "Parameters": {
+        "commands": [
+            "cd /var/www/barberflow",
+            "cat << 'EOF' > test_notificacao.php\n<?php\nrequire 'vendor/autoload.php';\n$app = require_once 'bootstrap/app.php';\n$kernel = $app->make(Illuminate\\Contracts\\Console\\Kernel::class);\n$kernel->bootstrap();\ntry {\n    \\Illuminate\\Support\\Facades\\Mail::raw('Este é um e-mail de teste de depuração para notificacao@thbarbearia.xyz.', function($msg) {\n        $msg->to('notificacao@thbarbearia.xyz')->subject('Teste Notificacao BarberFlow AWS');\n    });\n    echo \"Success Notificacao\";\n} catch (\\Exception $e) {\n    echo \"Error: \" . $e->getMessage();\n}\nEOF",
+            "php test_notificacao.php"
+        ]
+    }
+}

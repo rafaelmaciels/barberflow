@@ -1,0 +1,49 @@
+name: Deploy to Demo Environment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to AWS Demo Instance
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Sync Files to S3 Bucket
+        run: |
+          # Sync everything to S3, excluding .git and github workflow files
+          aws s3 sync . s3://barberflow-deploy-bucket-2026/ \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --exclude "node_modules/*" \
+            --delete
+
+      - name: Deploy to Demo Instance via AWS SSM
+        run: |
+          aws ssm send-command \
+            --instance-ids "i-082847e5f89fe3d87" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy from GitHub Actions" \
+            --parameters commands='[
+              "cd /var/www/barberflow",
+              "aws s3 sync s3://barberflow-deploy-bucket-2026/ . --delete",
+              "chown -R www-data:www-data /var/www/barberflow",
+              "chmod -R 775 /var/www/barberflow/storage /var/www/barberflow/bootstrap/cache",
+              "php artisan migrate --force",
+              "php artisan config:cache",
+              "php artisan route:cache",
+              "php artisan view:cache",
+              "systemctl reload nginx"
+            ]'

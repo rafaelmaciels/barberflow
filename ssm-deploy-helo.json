@@ -1,0 +1,16 @@
+{
+    "InstanceIds": [
+        "i-082847e5f89fe3d87",
+        "i-04bfb2984c8a0b7ee"
+    ],
+    "DocumentName": "AWS-RunShellScript",
+    "Parameters": {
+        "commands": [
+            "sed -i '/MAIL_EHLO_DOMAIN/d' /var/www/barberflow/.env",
+            "echo 'MAIL_EHLO_DOMAIN=[127.0.0.1]' >> /var/www/barberflow/.env",
+            "cd /var/www/barberflow",
+            "php artisan config:clear",
+            "php artisan cache:clear"
+        ]
+    }
+}

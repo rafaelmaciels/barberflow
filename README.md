@@ -90,6 +90,15 @@ Página pública e responsiva (`/`) onde o cliente pode:
 - Valor
 - Tempo de duração
 - Serviço ativo/inativo
+- **Serviço de Cortesia/Fidelidade**: Invisível para clientes e funcionários. Acessível apenas para administradores criarem encaixes promocionais (valor zerado).
+
+---
+
+## ⚙️ Pipeline CI/CD
+
+- Workflow configurado com **GitHub Actions** (`.github/workflows/deploy-demo.yml`).
+- Deploy automatizado e sem downtime via **AWS Systems Manager (SSM)** e S3.
+- Acionado automaticamente a cada _push_ na branch principal para ambientes de Demonstração.
 
 ---
 

@@ -1,0 +1,12 @@
+{
+    "InstanceIds": [
+        "i-082847e5f89fe3d87"
+    ],
+    "DocumentName": "AWS-RunShellScript",
+    "Parameters": {
+        "commands": [
+            "cd /var/www/barberflow",
+            "php artisan tinker --execute=\"echo \\\"Total Users: \\\" . App\\\\Models\\\\User::count() . \\\"\\\\n\\\"; print_r(App\\\\Models\\\\User::pluck('email')->toArray());\""
+        ]
+    }
+}

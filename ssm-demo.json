@@ -1,0 +1,22 @@
+{
+    "InstanceIds": [
+        "i-082847e5f89fe3d87"
+    ],
+    "DocumentName": "AWS-RunShellScript",
+    "Parameters": {
+        "commands": [
+            "curl \"https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip\" -o \"awscliv2.zip\"",
+            "unzip -q -o awscliv2.zip",
+            "./aws/install --update",
+            "cd /var/www/barberflow",
+            "/usr/local/bin/aws s3 cp s3://barberflow-deploy-bucket-2026/app_producao.zip .",
+            "unzip -q -o app_producao.zip",
+            "php artisan migrate --force",
+            "php artisan config:clear",
+            "php artisan optimize:clear",
+            "chown -R www-data:www-data /var/www/barberflow",
+            "chmod -R 775 /var/www/barberflow/storage",
+            "chmod -R 775 /var/www/barberflow/bootstrap/cache"
+        ]
+    }
+}

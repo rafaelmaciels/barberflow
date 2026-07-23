@@ -15,10 +15,12 @@ class Service extends Model
         'duracao',
         'valor',
         'ativo',
+        'is_admin_only',
     ];
 
     protected $casts = [
         'ativo' => 'boolean',
+        'is_admin_only' => 'boolean',
         'valor' => 'decimal:2',
     ];
 }

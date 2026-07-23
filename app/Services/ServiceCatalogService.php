@@ -26,6 +26,7 @@ class ServiceCatalogService
     public function createService(array $data)
     {
         $data['ativo'] = isset($data['ativo']) ? true : false;
+        $data['is_admin_only'] = isset($data['is_admin_only']) ? true : false;
         
         // Formatar valor para decimal caso o frontend mande com virgula
         if (isset($data['valor'])) {
@@ -38,6 +39,7 @@ class ServiceCatalogService
     public function updateService(int $id, array $data)
     {
         $data['ativo'] = isset($data['ativo']) ? true : false;
+        $data['is_admin_only'] = isset($data['is_admin_only']) ? true : false;
 
         // Formatar valor para decimal
         if (isset($data['valor'])) {

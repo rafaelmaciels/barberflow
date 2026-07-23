@@ -1,0 +1,14 @@
+{
+    "InstanceIds": [
+        "i-082847e5f89fe3d87"
+    ],
+    "DocumentName": "AWS-RunShellScript",
+    "Parameters": {
+        "commands": [
+            "systemctl restart php8.4-fpm",
+            "systemctl restart mysql",
+            "cd /var/www/barberflow",
+            "php artisan migrate --force"
+        ]
+    }
+}

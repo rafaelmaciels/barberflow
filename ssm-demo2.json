@@ -1,0 +1,15 @@
+{
+    "InstanceIds": [
+        "i-082847e5f89fe3d87"
+    ],
+    "DocumentName": "AWS-RunShellScript",
+    "Parameters": {
+        "commands": [
+            "apt-get update",
+            "apt-get install -y php8.4-mysql php8.4-xml php8.4-curl php8.4-mbstring php8.4-zip",
+            "cd /var/www/barberflow",
+            "php artisan migrate --force",
+            "php artisan optimize:clear"
+        ]
+    }
+}

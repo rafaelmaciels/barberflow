@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Pipeline CI/CD (GitHub Actions):** Deploy automatizado (`deploy-demo.yml`) configurado para atualizar a instância de Demonstração na AWS usando AWS Systems Manager (SSM) a cada push na branch principal.
+- **Serviço de Cortesia (Fidelidade):** Novo atributo `is_admin_only` (Exclusivo para Administração) em Serviços. Permite criar serviços invisíveis para clientes no site e para funcionários no painel. Somente Administradores podem aplicar esses serviços nos agendamentos.
 - **Deploy AWS EC2:** Adição de scripts de provisionamento de infraestrutura (`user-data.sh`) para AWS (LEMP stack) e `.env.producao` atualizado para uso do novo servidor e Certificado SSL Let's Encrypt.
 - **Módulo de Gestão de Usuários (RBAC):** Criação de níveis de acesso diferenciados (Administrador vs Funcionário/Barbeiro).
 - **Vínculo de Usuário e Barbeiro:** Ao criar um usuário do tipo "Funcionário", ele é vinculado a um barbeiro específico, restringindo o acesso dele à sua própria agenda e impedindo visualização da agenda de outros.

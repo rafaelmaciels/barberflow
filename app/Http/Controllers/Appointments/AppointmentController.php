@@ -42,6 +42,9 @@ class AppointmentController extends Controller
     {
         $barbers = $this->barberService->getAllBarbers()->where('ativo', true);
         $services = $this->serviceCatalog->getAllServices()->where('ativo', true);
+        if (!auth()->check() || !auth()->user()->isAdmin()) {
+            $services = $services->where('is_admin_only', false);
+        }
         return view('appointments.create', compact('barbers', 'services'));
     }
 
@@ -72,6 +75,9 @@ class AppointmentController extends Controller
 
         $barbers = $this->barberService->getAllBarbers()->where('ativo', true);
         $services = $this->serviceCatalog->getAllServices()->where('ativo', true);
+        if (!auth()->check() || !auth()->user()->isAdmin()) {
+            $services = $services->where('is_admin_only', false);
+        }
         
         return view('appointments.edit', compact('appointment', 'barbers', 'services'));
     }

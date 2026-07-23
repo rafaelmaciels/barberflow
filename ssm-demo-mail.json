@@ -1,0 +1,11 @@
+{
+    "InstanceIds": [
+        "i-082847e5f89fe3d87"
+    ],
+    "DocumentName": "AWS-RunShellScript",
+    "Parameters": {
+        "commands": [
+            "cat /var/www/barberflow/.env | grep MAIL_"
+        ]
+    }
+}
