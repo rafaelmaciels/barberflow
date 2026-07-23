@@ -28,6 +28,10 @@ jobs:
             --exclude ".git/*" \
             --exclude ".github/*" \
             --exclude "node_modules/*" \
+            --exclude ".env*" \
+            --exclude "storage/*" \
+            --exclude "bootstrap/cache/*" \
+            --exclude "vendor/*" \
             --delete
 
       - name: Deploy to Demo Instance via AWS SSM
@@ -38,9 +42,10 @@ jobs:
             --comment "Deploy from GitHub Actions" \
             --parameters commands='[
               "cd /var/www/barberflow",
-              "aws s3 sync s3://barberflow-deploy-bucket-2026/ . --delete",
+              "aws s3 sync s3://barberflow-deploy-bucket-2026/ . --exclude \".env*\" --exclude \"storage/*\" --exclude \"vendor/*\" --exclude \"bootstrap/cache/*\" --delete",
               "chown -R www-data:www-data /var/www/barberflow",
               "chmod -R 775 /var/www/barberflow/storage /var/www/barberflow/bootstrap/cache",
+              "composer install --no-dev --optimize-autoloader",
               "php artisan migrate --force",
               "php artisan config:cache",
               "php artisan route:cache",
