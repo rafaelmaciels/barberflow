@@ -59,47 +59,6 @@
                         </div>
                     </div>
 
-                    <h5 class="fw-bold mb-3 border-bottom pb-2 mt-4">Servidor de E-mail (SMTP)</h5>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="mail_host" class="form-label fw-semibold">Servidor (Host)</label>
-                            <input type="text" class="form-control" id="mail_host" name="mail_host" value="{{ $env['MAIL_HOST'] ?? '' }}" placeholder="smtp.exemplo.com">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="mail_port" class="form-label fw-semibold">Porta</label>
-                            <input type="text" class="form-control" id="mail_port" name="mail_port" value="{{ $env['MAIL_PORT'] ?? '' }}" placeholder="465">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="mail_encryption" class="form-label fw-semibold">Criptografia</label>
-                            <select class="form-select" id="mail_encryption" name="mail_encryption">
-                                <option value="" {{ ($env['MAIL_ENCRYPTION'] ?? '') == '' ? 'selected' : '' }}>Nenhuma</option>
-                                <option value="tls" {{ ($env['MAIL_ENCRYPTION'] ?? '') == 'tls' ? 'selected' : '' }}>TLS</option>
-                                <option value="ssl" {{ ($env['MAIL_ENCRYPTION'] ?? '') == 'ssl' ? 'selected' : '' }}>SSL</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="mail_username" class="form-label fw-semibold">Usuário SMTP</label>
-                            <input type="text" class="form-control" id="mail_username" name="mail_username" value="{{ $env['MAIL_USERNAME'] ?? '' }}">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="mail_password" class="form-label fw-semibold">Senha SMTP</label>
-                            <input type="password" class="form-control" id="mail_password" name="mail_password" placeholder="(Deixe em branco para não alterar)">
-                        </div>
-                    </div>
-
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label for="mail_from_address" class="form-label fw-semibold">E-mail Remetente</label>
-                            <input type="email" class="form-control" id="mail_from_address" name="mail_from_address" value="{{ $env['MAIL_FROM_ADDRESS'] ?? '' }}">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="mail_from_name" class="form-label fw-semibold">Nome Remetente</label>
-                            <input type="text" class="form-control" id="mail_from_name" name="mail_from_name" value="{{ trim($env['MAIL_FROM_NAME'] ?? '', '"') }}">
-                        </div>
-                    </div>
 
                     <div class="d-flex justify-content-end mt-4">
                         <button type="submit" class="btn btn-primary btn-lg fw-bold px-5">
