@@ -97,7 +97,7 @@ class PublicBookingController extends Controller
             // Send notification to the company email
             $companyEmail = \App\Models\Setting::where('key', 'company_email')->value('value') ?? env('MAIL_FROM_ADDRESS', 'admin@barberflow.com');
             
-            Mail::to($companyEmail)->queue(new AppointmentCreatedMail($data));
+            Mail::to($companyEmail)->send(new AppointmentCreatedMail($data));
         } catch (\Exception $e) {
             \Log::error('Erro ao enviar e-mail via Laravel Mail: ' . $e->getMessage());
         }
