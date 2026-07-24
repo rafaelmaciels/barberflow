@@ -30,6 +30,7 @@
                                     <th>Serviço</th>
                                     <th>Profissional</th>
                                     <th>Horário</th>
+                                    <th width="50"></th>
                                     <th width="200">Status</th>
                                 </tr>
                             </thead>
@@ -52,6 +53,21 @@
                                         </td>
                                         <td>
                                             <h5 class="fw-bold text-primary mb-0">{{ \Carbon\Carbon::parse($apt->hora)->format('H:i') }}</h5>
+                                        </td>
+                                        <td>
+                                            @php
+                                                $nomeBarbeiro = $apt->barber->nome ?? 'nossa equipe';
+                                                $nomeServico = $apt->service->nome ?? 'o servico';
+                                                $msg = "Ola, {$apt->cliente_nome}! Seu agendamento esta confirmado para o dia " . \Carbon\Carbon::parse($apt->data)->format('d/m/Y') . " as " . substr($apt->hora, 0, 5) . " na BarberFlow. Barbeiro: {$nomeBarbeiro} | Servico: {$nomeServico}.";
+                                                $num = preg_replace('/[^0-9]/', '', (string)$apt->cliente_whatsapp);
+                                                if(strlen($num) <= 11 && strlen($num) >= 10) {
+                                                    $num = '55' . $num;
+                                                }
+                                                $waLink = "https://wa.me/{$num}?text=" . urlencode($msg);
+                                            @endphp
+                                            <a href="{{ $waLink }}" target="_blank" class="btn btn-sm btn-success rounded-circle shadow-sm" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;" title="Confirmar pelo WhatsApp">
+                                                <i class="fa-brands fa-whatsapp"></i>
+                                            </a>
                                         </td>
                                         <td>
                                             <select class="form-select form-select-sm status-select fw-semibold" data-id="{{ $apt->id }}">
